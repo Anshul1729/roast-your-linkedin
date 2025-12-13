@@ -51,106 +51,88 @@ class ProfileRecord(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 async def scrape_linkedin_profile(linkedin_url: str) -> dict:
-    """Scrape LinkedIn profile using Apify API"""
-    apify_token = os.getenv("APIFY_API_TOKEN")
+    """Scrape LinkedIn profile using RapidAPI Fresh LinkedIn Profile Data"""
+    rapidapi_key = os.getenv("RAPIDAPI_KEY")
     
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            response = await client.post(
-                f"https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs?token={apify_token}",
-                json={"profileUrls": [linkedin_url]},
-                headers={"Content-Type": "application/json"}
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # URL encode the LinkedIn URL
+            from urllib.parse import quote
+            encoded_url = quote(linkedin_url, safe='')
+            
+            response = await client.get(
+                f"https://fresh-linkedin-profile-data.p.rapidapi.com/enrich-lead?linkedin_url={encoded_url}&include_skills=true&include_certifications=false&include_publications=false&include_honors=false&include_volunteers=false&include_projects=false&include_patents=false&include_courses=false&include_organizations=false&include_profile_status=false&include_company_public_url=false",
+                headers={
+                    "x-rapidapi-host": "fresh-linkedin-profile-data.p.rapidapi.com",
+                    "x-rapidapi-key": rapidapi_key
+                }
             )
             
-            # Check for API limit errors
+            logger.info(f"RapidAPI response status: {response.status_code}")
+            
+            # Check for API errors
             if response.status_code == 429:
                 raise HTTPException(
-                    status_code=429, 
-                    detail="Apify API rate limit reached. This is a free tier limitation. Please try again in a few minutes."
+                    status_code=429,
+                    detail="LinkedIn scraping API rate limit reached. Please try again in a few minutes."
                 )
-            elif response.status_code == 402:
+            elif response.status_code == 403:
                 raise HTTPException(
-                    status_code=402,
-                    detail="Apify API credits exhausted. The free API quota has been used up. Please try again later or contact support."
+                    status_code=403,
+                    detail="LinkedIn scraping API access denied. API key may be invalid or expired."
+                )
+            elif response.status_code != 200:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"LinkedIn scraping failed with status {response.status_code}. Please try again."
                 )
             
             response.raise_for_status()
-            run_data = response.json()
-            run_id = run_data["data"]["id"]
+            result = response.json()
             
-            for _ in range(30):
-                await asyncio.sleep(3)
-                status_response = await client.get(
-                    f"https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs/{run_id}?token={apify_token}"
-                )
-                status_response.raise_for_status()
-                status_data = status_response.json()
-                
-                if status_data["data"]["status"] == "SUCCEEDED":
-                    dataset_id = status_data["data"]["defaultDatasetId"]
-                    break
-                elif status_data["data"]["status"] in ["FAILED", "ABORTED", "TIMED-OUT"]:
-                    raise HTTPException(
-                        status_code=500,
-                        detail=f"LinkedIn profile scraping failed. Status: {status_data['data']['status']}. Please check the LinkedIn URL and try again."
-                    )
-            else:
+            # Check if API returned an error
+            if result.get('message') != 'ok' or 'data' not in result:
+                logger.error(f"RapidAPI returned unexpected response: {result}")
                 raise HTTPException(
-                    status_code=504,
-                    detail="Profile scraping is taking too long. The LinkedIn profile might be private or unavailable. Please try another profile."
+                    status_code=500,
+                    detail="LinkedIn scraping failed. The API returned an unexpected response."
                 )
             
-            result_response = await client.get(
-                f"https://api.apify.com/v2/datasets/{dataset_id}/items?token={apify_token}"
-            )
-            result_response.raise_for_status()
-            profile_data = result_response.json()
+            profile_data = result['data']
             
-            if profile_data and len(profile_data) > 0:
-                result = profile_data[0]
-                
-                # Check if Apify returned an error instead of profile data
-                if isinstance(result, dict) and 'error' in result:
-                    error_msg = result['error']
-                    logger.error(f"Apify returned error: {error_msg}")
-                    
-                    if "free Apify plan" in error_msg or "not via other methods" in error_msg:
-                        raise HTTPException(
-                            status_code=402,
-                            detail="LinkedIn scraping failed: Apify free plan doesn't support API access. Please upgrade to a paid Apify plan or use a different scraping method."
-                        )
-                    else:
-                        raise HTTPException(
-                            status_code=500,
-                            detail=f"LinkedIn scraping failed: {error_msg}"
-                        )
-                
-                # Validate that we have actual profile data
-                if not result.get('fullName') and not result.get('headline') and not result.get('summary'):
-                    logger.warning(f"Profile data is empty or invalid: {result}")
-                    raise HTTPException(
-                        status_code=404,
-                        detail="LinkedIn profile appears to be empty or inaccessible. The profile might be private, deleted, or the URL is incorrect."
-                    )
-                
-                return result
-            else:
+            # Validate that we have actual profile data
+            if not profile_data.get('full_name') and not profile_data.get('headline') and not profile_data.get('about'):
+                logger.warning(f"Profile data is empty or invalid")
                 raise HTTPException(
                     status_code=404,
-                    detail="No profile data received from LinkedIn. The profile might be private or doesn't exist."
+                    detail="LinkedIn profile appears to be empty or inaccessible. The profile might be private, deleted, or the URL is incorrect."
                 )
+            
+            logger.info(f"Successfully scraped profile: {profile_data.get('full_name', 'Unknown')}")
+            return profile_data
+            
     except httpx.HTTPStatusError as e:
+        logger.error(f"HTTP error during scraping: {str(e)}")
         if e.response.status_code == 429:
             raise HTTPException(
                 status_code=429,
-                detail="Apify API rate limit reached. This is a free tier limitation. Please try again in a few minutes."
+                detail="LinkedIn scraping API rate limit reached. Please try again in a few minutes."
             )
-        elif e.response.status_code == 402:
+        elif e.response.status_code == 403:
             raise HTTPException(
-                status_code=402,
-                detail="Apify API credits exhausted. The free API quota has been used up. Please try again later."
+                status_code=403,
+                detail="LinkedIn scraping API access denied. API key may be invalid."
             )
-        raise
+        raise HTTPException(
+            status_code=500,
+            detail=f"LinkedIn scraping failed: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"Error during scraping: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while scraping the LinkedIn profile: {str(e)}"
+        )
 
 async def generate_roast(profile_data: dict, roast_style: str) -> str:
     """Generate roast text using Claude"""
