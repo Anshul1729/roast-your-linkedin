@@ -91,8 +91,8 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
             return {}
 
 async def generate_roast(profile_data: dict, roast_style: str) -> str:
-    """Generate roast text using Claude"""
-    anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    """Generate roast text using Claude via emergentintegrations"""
+    llm_client = AsyncLLMClient(api_key=os.getenv("ANTHROPIC_API_KEY"))
     
     style_prompts = {
         "savage": "brutal, ruthless, and savage. Don't hold back. Roast them hard.",
@@ -121,13 +121,13 @@ Here's the LinkedIn profile data:
 
 Create a roast that's about 150-200 words. Make it entertaining and memorable. The roast should flow naturally as if you're talking to them directly."""
     
-    message = anthropic_client.messages.create(
+    response = await llm_client.achat_completion(
         model="claude-sonnet-4-20250514",
-        max_tokens=1024,
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=1024
     )
     
-    return message.content[0].text
+    return response.choices[0].message.content
 
 async def generate_audio(text: str) -> str:
     """Generate audio using Sarvam TTS API"""
