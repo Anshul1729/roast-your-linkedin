@@ -95,10 +95,10 @@ async def generate_roast(profile_data: dict, roast_style: str) -> str:
     anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
     
     style_prompts = {
-        "savage": "absolutely BRUTAL and RUTHLESS. Destroy them completely. Hold NOTHING back. Make them question their entire existence. Be devastatingly harsh, cruel, and merciless. This is maximum damage mode.",
-        "funny": "hilariously SAVAGE and cutting. Roast them to ashes while making it comedic gold. Mock everything mercilessly but keep it entertaining. Dark humor is encouraged.",
-        "witty": "intellectually DEVASTATING and razor-sharp. Use your intelligence as a weapon to dismantle them piece by piece. Surgical precision in destruction. Make them feel utterly inadequate.",
-        "mix": "an EXTREME combination of savage brutality, dark humor, and intellectual destruction. Pull no punches. This is total annihilation."
+        "savage": "absolutely BRUTAL and RUTHLESS. Short, punchy, devastating lines. Destroy them completely with maximum impact per sentence.",
+        "funny": "hilariously SAVAGE with rapid-fire jokes. Short, sharp, comedic destruction. Make every line count.",
+        "witty": "intellectually DEVASTATING with clever one-liners. Short, sharp, intelligent burns. Surgical precision.",
+        "mix": "EXTREME mix of brutal one-liners, savage jokes, and devastating observations. Rapid-fire destruction."
     }
     
     style_instruction = style_prompts.get(roast_style, style_prompts["mix"])
@@ -112,24 +112,25 @@ Education: {len(profile_data.get('education', []))} institutions
 Skills: {', '.join(profile_data.get('skills', [])[:10])}
 """
     
-    prompt = f"""You are a RUTHLESS roaster who absolutely DESTROYS LinkedIn profiles. Your roasts should be {style_instruction}
+    prompt = f"""You are a RUTHLESS roaster. Your roasts should be {style_instruction}
 
-IMPORTANT RULES:
-- Write ONLY in English. NO Hindi, NO Hinglish.
-- Be EXTREMELY harsh and brutal. This is not gentle roasting.
-- Attack their profile, achievements, skills, experience - everything is fair game.
-- Make them feel utterly destroyed.
-- Be creative and devastating in your insults.
-- Keep it around 120-150 words for maximum impact.
+CRITICAL RULES:
+- Write ONLY in English. NO other languages.
+- Maximum 60-70 words total. SHORT and PUNCHY.
+- Use short sentences (5-15 words each). Like a rapid-fire attack.
+- Each line should hit HARD. No filler.
+- Be conversational and direct. Talk TO them, not about them.
+- Use questions, exclamations, pauses for dramatic effect.
+- Make it sound like spoken word, not an essay.
 
-Here's the LinkedIn profile data:
+Profile:
 {profile_summary}
 
-Now DESTROY this profile. Make it hurt. Show no mercy."""
+DESTROY them in 60-70 words. Short punchy lines. GO."""
     
     message = anthropic_client.messages.create(
         model="claude-sonnet-4-5-20250929",
-        max_tokens=1024,
+        max_tokens=512,
         messages=[{"role": "user", "content": prompt}]
     )
     
