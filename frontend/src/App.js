@@ -200,8 +200,27 @@ function App() {
                   </h3>
                 </div>
 
-                <div className="mb-8 text-[#E0E0E0] leading-relaxed text-lg whitespace-pre-wrap" data-testid="roast-text">
-                  {roastData.roast_text}
+                <div className="mb-8 min-h-[200px]" data-testid="roast-text">
+                  {isPlaying ? (
+                    <div className="space-y-4">
+                      {roastData.roast_lines.map((line, index) => (
+                        <div
+                          key={index}
+                          className={`text-xl leading-relaxed transition-all duration-500 ${
+                            index <= currentLineIndex
+                              ? "text-[#FF2E00] opacity-100 scale-100"
+                              : "text-[#666666] opacity-30 scale-95"
+                          }`}
+                        >
+                          {line}.
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-[#E0E0E0] leading-relaxed text-lg whitespace-pre-wrap">
+                      {roastData.roast_text}
+                    </div>
+                  )}
                 </div>
 
                 <div className="bg-black/50 border border-white/10 p-6">
@@ -212,6 +231,21 @@ function App() {
                     className="w-full"
                     style={{
                       filter: "invert(1) hue-rotate(180deg)",
+                    }}
+                    onPlay={() => {
+                      setIsPlaying(true);
+                      setCurrentLineIndex(0);
+                      const duration = roastData.roast_lines.length * 3;
+                      roastData.roast_lines.forEach((_, index) => {
+                        setTimeout(() => {
+                          setCurrentLineIndex(index);
+                        }, (index * duration * 1000) / roastData.roast_lines.length);
+                      });
+                    }}
+                    onPause={() => setIsPlaying(false)}
+                    onEnded={() => {
+                      setIsPlaying(false);
+                      setCurrentLineIndex(roastData.roast_lines.length - 1);
                     }}
                   />
                 </div>
