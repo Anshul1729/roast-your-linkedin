@@ -180,19 +180,20 @@ async def generate_audio(text: str) -> str:
         # ElevenLabs supports up to 40,000 characters for turbo v2.5
         # Our roasts are ~60-70 words (~400 chars), so no chunking needed
         
-        # Using Sarah voice (EXAVITQu4vr4xnSDxMaL) - clear and expressive
-        voice_id = "EXAVITQu4vr4xnSDxMaL"
+        # Using Akshay - Indian Accent Narrator (male, Indian accent, energetic)
+        voice_id = "CZdRaSQ51p0onta4eec8"
         
         async with httpx.AsyncClient(timeout=60.0) as client:
             payload = {
                 "text": text,
                 "model_id": "eleven_turbo_v2_5",
                 "voice_settings": {
-                    "stability": 0.4,  # Lower for more dynamic/expressive
-                    "similarity_boost": 0.75,  # Higher for better voice match
-                    "style": 0.6,  # Add some stylistic variation
-                    "use_speaker_boost": True  # Enhanced clarity
-                }
+                    "stability": 0.3,  # Lower for more dynamic/aggressive delivery
+                    "similarity_boost": 0.8,  # Higher for better voice match
+                    "style": 0.8,  # High stylistic variation for roasting energy
+                    "use_speaker_boost": True  # Enhanced clarity and volume
+                },
+                "output_format": "mp3_44100_128"  # High quality MP3
             }
             
             logger.info(f"Calling ElevenLabs TTS API with voice: {voice_id}")
