@@ -153,14 +153,14 @@ function App() {
                       key={style.value}
                       data-testid={`roast-style-${style.value}`}
                       onClick={() => setRoastStyle(style.value)}
-                      className={`p-4 border-2 transition-all duration-100 uppercase tracking-widest text-sm ${
+                      className={`p-2 md:p-4 border-2 transition-all duration-100 uppercase tracking-widest text-xs md:text-sm ${
                         roastStyle === style.value
                           ? "border-[#FF2E00] bg-[#FF2E00] text-white"
                           : "border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#FF2E00] hover:scale-105"
                       }`}
                       disabled={loading}
                     >
-                      <div className="text-2xl mb-2">{style.emoji}</div>
+                      <div className="text-xl md:text-2xl mb-1 md:mb-2">{style.emoji}</div>
                       {style.label}
                     </button>
                   ))}
