@@ -122,9 +122,9 @@ function App() {
           </div>
 
           {!roastData && (
-            <div className="bg-[#0A0A0A] border border-white/10 p-8 mb-8" data-testid="input-section">
-              <div className="mb-6">
-                <label className="block text-sm mb-2 uppercase tracking-wider text-[#E0E0E0]">
+            <div className="bg-[#0A0A0A] border border-white/10 p-4 md:p-8 mb-8" data-testid="input-section">
+              <div className="mb-4 md:mb-6">
+                <label className="block text-xs md:text-sm mb-2 uppercase tracking-wider text-[#E0E0E0]">
                   LinkedIn Profile URL
                 </label>
                 <Input
@@ -133,16 +133,16 @@ function App() {
                   placeholder="https://www.linkedin.com/in/username"
                   value={linkedinUrl}
                   onChange={(e) => setLinkedinUrl(e.target.value)}
-                  className="h-16 text-xl bg-black border-b-2 border-white/20 focus:border-[#FF2E00] focus:ring-0 rounded-none placeholder:text-white/20"
+                  className="h-12 md:h-16 text-base md:text-xl bg-black border-b-2 border-white/20 focus:border-[#FF2E00] focus:ring-0 rounded-none placeholder:text-white/20"
                   disabled={loading}
                 />
               </div>
 
-              <div className="mb-8">
-                <label className="block text-sm mb-4 uppercase tracking-wider text-[#E0E0E0]">
+              <div className="mb-6 md:mb-8">
+                <label className="block text-xs md:text-sm mb-3 md:mb-4 uppercase tracking-wider text-[#E0E0E0]">
                   Roast Style
                 </label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
                   {[
                     { value: "savage", label: "SAVAGE", emoji: "💀" },
                     { value: "funny", label: "FUNNY", emoji: "😂" },
