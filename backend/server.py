@@ -181,7 +181,7 @@ async def generate_audio(text: str) -> str:
         # Our roasts are ~60-70 words (~400 chars), so no chunking needed
         
         # Using Akshay - Indian Accent Narrator (male, Indian accent, energetic)
-        voice_id = "CZdRaSQ51p0onta4eec8"
+        voice_id = "swh0hLPsEaD50F02tIJJ"
         
         async with httpx.AsyncClient(timeout=60.0) as client:
             payload = {
