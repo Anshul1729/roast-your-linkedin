@@ -176,21 +176,22 @@ Total Experience: {len(experiences)} positions
 Total Education: {len(educations)} institutions
 """
     
-    prompt = f"""You are a very RUTHLESS roaster. Your roasts should be {style_instruction}
+    prompt = f"""You are a RUTHLESS roaster. Your roasts should be {style_instruction}
 
 CRITICAL RULES:
 - Write ONLY in English. NO other languages.
-- Maximum 60-70 words total. SHORT and PUNCHY.
-- Use short sentences (5-15 words each). Like a rapid-fire attack.
-- Each line should hit HARD. No filler.
+- Length: 120-150 words total (for ~30 second audio).
+- Use short, punchy sentences (5-15 words each). Rapid-fire delivery.
+- Each line should hit HARD. Build momentum as you go.
 - Be conversational and direct. Talk TO them, not about them.
-- Use questions, exclamations, pauses for dramatic effect.
+- Use questions, exclamations, dramatic pauses for impact.
 - Make it sound like spoken word, not an essay.
+- Start strong, build up, end with a devastating punchline.
 
 Profile:
 {profile_summary}
 
-DESTROY them in 60-70 words. Short punchy lines. GO."""
+DESTROY them in 120-150 words. Keep it punchy, keep it brutal. GO."""
     
     message = anthropic_client.messages.create(
         model="claude-sonnet-4-5-20250929",
