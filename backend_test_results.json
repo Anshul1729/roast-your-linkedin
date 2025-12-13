@@ -1,46 +1,46 @@
 {
   "summary": {
     "total_tests": 6,
-    "passed_tests": 3,
-    "success_rate": "50.0%",
-    "timestamp": "2025-12-13T15:20:25.872186"
+    "passed_tests": 5,
+    "success_rate": "83.3%",
+    "timestamp": "2025-12-13T15:30:52.182579"
   },
   "detailed_results": [
     {
       "test_name": "API Health Check",
       "status": "PASSED",
       "details": "Status: 200, Response: {'message': 'LinkedIn Roaster API'}",
-      "timestamp": "2025-12-13T15:19:23.871961"
+      "timestamp": "2025-12-13T15:30:33.713442"
     },
     {
       "test_name": "Generate Roast Endpoint",
       "status": "FAILED",
-      "details": "Status: 500, Error: {\"detail\":\"API Error: Client error '404 Not Found' for url 'https://api.apify.com/v2/acts/2SyF0bVxmgGr8IVCZ/runs/usoXaVEqFFGOwKFrg/dataset/items?token=apify_api_HE3cZcub6JKSLBDSTbwdnMkhd52IJf1Uo7O9'\\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404\"}",
-      "timestamp": "2025-12-13T15:19:39.335890"
+      "details": "Status: 500, Error: {\"detail\":\"Failed to communicate with external service. Please try again.\"}",
+      "timestamp": "2025-12-13T15:30:51.996386"
     },
     {
       "test_name": "Audio Endpoint",
       "status": "PASSED",
       "details": "Status: 404 (expected 404 for non-existent file)",
-      "timestamp": "2025-12-13T15:19:39.396416"
+      "timestamp": "2025-12-13T15:30:52.057782"
     },
     {
       "test_name": "Invalid Input - Empty URL",
-      "status": "FAILED",
-      "details": "Status: 500, Expected: [400, 422]",
-      "timestamp": "2025-12-13T15:19:54.894282"
+      "status": "PASSED",
+      "details": "Status: 400, Expected: [400, 422]",
+      "timestamp": "2025-12-13T15:30:52.100810"
     },
     {
       "test_name": "Invalid Input - Invalid URL",
       "status": "PASSED",
-      "details": "Status: 500, Expected: [400, 422, 500]",
-      "timestamp": "2025-12-13T15:20:10.415162"
+      "details": "Status: 400, Expected: [400, 422, 500]",
+      "timestamp": "2025-12-13T15:30:52.137302"
     },
     {
       "test_name": "Invalid Input - Invalid Roast Style",
-      "status": "FAILED",
-      "details": "Status: 500, Expected: [200, 201, 400, 422]",
-      "timestamp": "2025-12-13T15:20:25.871181"
+      "status": "PASSED",
+      "details": "Status: 400, Expected: [200, 201, 400, 422]",
+      "timestamp": "2025-12-13T15:30:52.181579"
     }
   ]
 }
