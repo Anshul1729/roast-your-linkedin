@@ -285,6 +285,27 @@ function App() {
             </div>
           )}
         </div>
+
+        {/* Footer */}
+        <footer className="mt-16 pb-24 md:pb-16 border-t border-white/10 pt-8">
+          <div className="text-center space-y-3">
+            <p className="text-xs md:text-sm text-[#666666]">
+              Created by{" "}
+              <a
+                href="https://www.linkedin.com/in/anshul-shivhare/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#FF2E00] hover:text-white transition-colors underline"
+              >
+                Anshul
+              </a>
+            </p>
+            <p className="text-xs text-[#444444] italic">
+              Loved your roast? Send a gift:{" "}
+              <span className="text-[#888888] font-mono">anshul.sbi1@ybl</span>
+            </p>
+          </div>
+        </footer>
       </div>
 
       <Toaster position="top-center" theme="dark" />
