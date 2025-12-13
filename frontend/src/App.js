@@ -186,19 +186,19 @@ function App() {
           )}
 
           {roastData && (
-            <div className="space-y-6 pb-32" data-testid="roast-result">
-              <div className="bg-[#0A0A0A] border border-white/10 p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="text-4xl">🔥</div>
+            <div className="space-y-6 pb-40 md:pb-32" data-testid="roast-result">
+              <div className="bg-[#0A0A0A] border border-white/10 p-4 md:p-8">
+                <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                  <div className="text-2xl md:text-4xl">🔥</div>
                   <h3
-                    className="text-3xl uppercase tracking-wider text-[#FF2E00]"
+                    className="text-xl md:text-3xl uppercase tracking-wider text-[#FF2E00]"
                     style={{ fontFamily: "'Anton', sans-serif" }}
                   >
                     ROASTED
                   </h3>
                 </div>
 
-                <div className="mb-8 min-h-[200px]" data-testid="roast-text">
+                <div className="mb-6 md:mb-8 min-h-[150px] md:min-h-[200px]" data-testid="roast-text">
                   {isPlaying ? (
                     <div className="space-y-4">
                       {roastData.roast_lines.map((line, index) => (
