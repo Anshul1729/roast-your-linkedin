@@ -123,6 +123,21 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
                 )
             
             logger.info(f"Successfully scraped profile: {profile_data.get('full_name', 'Unknown')}")
+            
+            # Cache the profile data
+            await db.linkedin_cache.update_one(
+                {"linkedin_url": linkedin_url},
+                {
+                    "$set": {
+                        "linkedin_url": linkedin_url,
+                        "profile_data": profile_data,
+                        "cached_at": datetime.now(timezone.utc)
+                    }
+                },
+                upsert=True
+            )
+            logger.info(f"Cached profile data for {linkedin_url}")
+            
             return profile_data
             
     except httpx.HTTPStatusError as e:
