@@ -1,0 +1,112 @@
+{
+  "identity": {
+    "name": "The Roast Terminal",
+    "archetype": "Electric & Neon (Archetype 2) x Brutalist",
+    "vibe": "Underground Comedy Club meets Hacker Terminal. Dark, gritty, high-contrast, and unapologetic.",
+    "principles": [
+      "Fusion: Stand-up Comedy Stage (Spotlights) + Glitch Art (Terminal text).",
+      "Emotion: Intimidation followed by Hilarity.",
+      "Content: The Roast is the hero. Text must be legible but stylized.",
+      "Contrast: Pure Black backgrounds vs. Neon Orange/Red highlights."
+    ]
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Anton, sans-serif",
+      "usage": "Main titles, 'ROASTED' stamps, aggressive CTAs.",
+      "weight": "400 (Anton only has one weight)",
+      "letter_spacing": "tracking-wide",
+      "transform": "uppercase"
+    },
+    "body": {
+      "font_family": "Space Mono, monospace",
+      "usage": "Roast text, inputs, metadata, terminal logs.",
+      "weight": "400, 700"
+    },
+    "installation": "Import from Google Fonts: @import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');"
+  },
+  "colors": {
+    "palette": {
+      "background": "#050505",
+      "surface": "#0A0A0A",
+      "primary": "#FF2E00",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#7000FF",
+      "accent": "#00FF94",
+      "text_main": "#E0E0E0",
+      "text_muted": "#666666",
+      "border": "#1F1F1F"
+    },
+    "usage_rules": [
+      "Backgrounds must be #050505 (Void Black).",
+      "Primary color (#FF2E00) is for 'Dangerous' actions (Generate Roast).",
+      "Secondary color (#7000FF) is for 'Tech' elements (AI processing).",
+      "Borders should be subtle (#1F1F1F) unless active/focused (#FF2E00)."
+    ]
+  },
+  "layout": {
+    "grid_system": "Bento Grid (Mode A) for results page. Single column 'Spotlight' for Home.",
+    "spacing": "Generous. Use p-8 to p-12 for containers. Gap-6 for grids.",
+    "containers": "Sharp edges (rounded-none) or minimal rounded-sm. No pill shapes.",
+    "alignment": "Center-aligned Hero (The Stage). Left-aligned Roast Text (The Script)."
+  },
+  "components": {
+    "buttons": {
+      "style": "Sharp edges, uppercase text, hover:glitch effect.",
+      "classes": "rounded-none border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-white transition-all duration-100 font-mono uppercase tracking-widest"
+    },
+    "inputs": {
+      "style": "Massive, high contrast, terminal style.",
+      "classes": "h-16 text-xl bg-black border-b-2 border-white/20 focus:border-primary focus:ring-0 rounded-none font-mono placeholder:text-white/20"
+    },
+    "cards": {
+      "style": "Terminal window aesthetic.",
+      "classes": "bg-[#0A0A0A] border border-white/10 p-6 relative overflow-hidden"
+    },
+    "toast": {
+      "library": "sonner",
+      "style": "Dark mode default, sharp corners."
+    }
+  },
+  "visual_enhancers": {
+    "textures": "Use grain overlays on the background to avoid 'flat' black.",
+    "effects": [
+      "Glitch effect on hover for interactive elements.",
+      "CRT Scanline overlay (optional, low opacity) for the 'Terminal' feel.",
+      "Neon glow (box-shadow) on the primary button."
+    ],
+    "animations": "Typewriter effect for the roast text generation. It must feel like it's being written live."
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "background_texture",
+        "url": "https://images.unsplash.com/photo-1698376146545-5acb1bc8ea80?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzZ8MHwxfHNlYXJjaHwzfHxkYXJrJTIwZ3J1bmdlJTIwdGV4dHVyZSUyMGFic3RyYWN0fGVufDB8fHx8MTc2NTYzODczMXww&ixlib=rb-4.1.0&q=85",
+        "description": "Dark grunge metal texture for background overlay (low opacity)."
+      },
+      {
+        "category": "hero_fire",
+        "url": "https://images.unsplash.com/photo-1644261766628-3af7203be678?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwxfHxuZW9uJTIwZmlyZSUyMGZsYW1lJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzY1NjM4NzMyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract neon fire for the 'Roast' visual metaphor."
+      },
+      {
+        "category": "audio_mic",
+        "url": "https://images.unsplash.com/photo-1719437364589-17a545612428?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwzfHxyZXRybyUyMG1pY3JvcGhvbmUlMjBkYXJrJTIwc3RhZ2V8ZW58MHx8fHwxNzY1NjM4NzMzfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Microphone in dark setting for the audio player section."
+      }
+    ],
+    "icons": "Use 'lucide-react' with sharp strokes. Icons: Flame, Mic, Share2, Download, Skull."
+  },
+  "instructions_to_main_agent": {
+    "general": "You are building a 'Roast' app. The UI should feel slightly aggressive but fun. Do not use 'friendly' rounded corners. Use sharp, brutalist geometry.",
+    "hinglish_support": "Ensure the font 'Space Mono' supports basic Latin characters. Hinglish is just English characters, so no special font needed, but the *vibe* of the text is key.",
+    "loading_states": "Instead of 'Loading...', use roast-themed messages like 'Stalking their profile...', 'Finding cringe content...', 'Preparing emotional damage...'.",
+    "audio_player": "Create a custom audio player. Do not use the default browser <audio> tag. It must look like a waveform visualizer.",
+    "file_structure": "Use .js files for React components as per the project setup. Do not use .tsx."
+  },
+  "universal_guidelines": {
+    "interactions": "Every button must have a hover state. Use 'transform: scale(1.02)' or color shifts.",
+    "accessibility": "Ensure text contrast is high. The primary red (#FF2E00) should be used for large text or buttons, not small body text.",
+    "testing": "Add data-testid to the Input field ('linkedin-url-input'), the Generate button ('generate-roast-btn'), and the Audio Player ('roast-audio-player')."
+  }
+}
