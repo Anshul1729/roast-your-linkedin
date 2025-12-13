@@ -238,9 +238,9 @@ function App() {
               </div>
 
               {/* Sticky Audio Controls at Bottom */}
-              <div className="fixed bottom-0 left-0 right-0 bg-[#0A0A0A] border-t-2 border-[#FF2E00] p-4 shadow-[0_-10px_40px_rgba(255,46,0,0.3)] z-50">
-                <div className="container mx-auto max-w-4xl space-y-4">
-                  <div className="bg-black/50 border border-white/10 p-4">
+              <div className="fixed bottom-0 left-0 right-0 bg-[#0A0A0A] border-t-2 border-[#FF2E00] shadow-[0_-10px_40px_rgba(255,46,0,0.3)] z-50">
+                <div className="container mx-auto max-w-4xl">
+                  <div className="bg-black/80 border-2 border-[#FF2E00]/50 p-4 md:p-6 m-4">
                     <audio
                       data-testid="roast-audio-player"
                       controls
@@ -267,11 +267,11 @@ function App() {
                     />
                   </div>
 
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 px-4 pb-4">
                     <Button
                       data-testid="download-btn"
                       onClick={handleDownload}
-                      className="flex-1 h-12 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#7000FF] hover:bg-[#7000FF] hover:text-white transition-all duration-100 uppercase tracking-widest text-sm"
+                      className="flex-1 h-12 md:h-14 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#7000FF] hover:bg-[#7000FF] hover:text-white transition-all duration-100 uppercase tracking-widest text-xs md:text-sm"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       DOWNLOAD
@@ -279,21 +279,40 @@ function App() {
                     <Button
                       data-testid="share-btn"
                       onClick={handleShare}
-                      className="flex-1 h-12 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#00FF94] hover:bg-[#00FF94] hover:text-black transition-all duration-100 uppercase tracking-widest text-sm"
+                      className="flex-1 h-12 md:h-14 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#00FF94] hover:bg-[#00FF94] hover:text-black transition-all duration-100 uppercase tracking-widest text-xs md:text-sm"
                     >
                       <Share2 className="mr-2 h-4 w-4" />
                       SHARE
                     </Button>
-                    <Button
-                      data-testid="roast-another-btn"
-                      onClick={() => {
-                        setRoastData(null);
-                        setLinkedinUrl("");
-                      }}
-                      className="flex-1 h-12 rounded-none border-2 border-[#FF2E00] bg-transparent text-[#FF2E00] hover:bg-[#FF2E00] hover:text-white transition-all duration-100 uppercase tracking-widest text-sm"
-                    >
-                      ROAST ANOTHER
-                    </Button>
+                  </div>
+                  
+                  {/* Footer on Roast Page */}
+                  <div className="border-t border-white/10 py-3 text-center space-y-2">
+                    <p className="text-xs text-[#666666]">
+                      Created by{" "}
+                      <a
+                        href="https://www.linkedin.com/in/anshul-shivhare/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#FF2E00] hover:text-white transition-colors inline-flex items-center gap-1"
+                      >
+                        Anshul
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                      </a>
+                    </p>
+                    <p className="text-xs text-[#444444] italic">
+                      Loved your roast?{" "}
+                      <a
+                        href="https://www.linkedin.com/in/anshul-shivhare/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#888888] hover:text-[#FF2E00] transition-colors"
+                      >
+                        Drop a hi 👋
+                      </a>
+                    </p>
                   </div>
                 </div>
               </div>
