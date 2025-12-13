@@ -9,11 +9,12 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import httpx
 import anthropic
 import aiofiles
 import asyncio
+from agnost import track, config
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -24,6 +25,11 @@ db = client[os.environ['DB_NAME']]
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+
+# Add Agnost tracking
+track(app, "c997e4e3-b251-4853-8ff8-801ea06eaf2b", config(
+    endpoint="https://api.agnost.ai"
+))
 
 AUDIO_DIR = Path("./audio_files")
 AUDIO_DIR.mkdir(exist_ok=True)
