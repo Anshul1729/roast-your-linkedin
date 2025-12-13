@@ -62,7 +62,8 @@ function App() {
     if (roastData) {
       const link = document.createElement("a");
       link.href = `${BACKEND_URL}${roastData.audio_url}`;
-      link.download = `roast_${Date.now()}.mp3`;
+      const extension = roastData.audio_url.endsWith('.wav') ? 'wav' : 'mp3';
+      link.download = `roast_${Date.now()}.${extension}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
