@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi.responses import FileResponse, StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,67 +7,202 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
-
+import httpx
+import anthropic
+import aiofiles
+import asyncio
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
 app = FastAPI()
-
-# Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+AUDIO_DIR = Path("./audio_files")
+AUDIO_DIR.mkdir(exist_ok=True)
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
+class LinkedInProfileRequest(BaseModel):
+    linkedin_url: str
+    roast_style: str = "mix"  # savage, funny, witty, mix
+
+class RoastResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    roast_text: str
+    audio_url: str
+    request_id: str
+    created_at: datetime
+
+class ProfileRecord(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    linkedin_url: str
+    profile_data: dict
+    roast_text: str
+    roast_style: str
+    audio_filename: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+async def scrape_linkedin_profile(linkedin_url: str) -> dict:
+    """Scrape LinkedIn profile using Apify API"""
+    apify_token = os.getenv("APIFY_API_TOKEN")
+    
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        response = await client.post(
+            f"https://api.apify.com/v2/acts/2SyF0bVxmgGr8IVCZ/runs?token={apify_token}",
+            json={"profileUrls": [linkedin_url]},
+            headers={"Content-Type": "application/json"}
+        )
+        response.raise_for_status()
+        run_data = response.json()
+        run_id = run_data["data"]["id"]
+        
+        await asyncio.sleep(15)
+        
+        result_response = await client.get(
+            f"https://api.apify.com/v2/acts/2SyF0bVxmgGr8IVCZ/runs/{run_id}/dataset/items?token={apify_token}"
+        )
+        result_response.raise_for_status()
+        profile_data = result_response.json()
+        
+        if profile_data and len(profile_data) > 0:
+            return profile_data[0]
+        else:
+            return {}
 
-# Add your routes to the router instead of directly to app
+async def generate_roast(profile_data: dict, roast_style: str) -> str:
+    """Generate roast text using Claude"""
+    anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    
+    style_prompts = {
+        "savage": "brutal, ruthless, and savage. Don't hold back. Roast them hard.",
+        "funny": "hilarious and light-hearted. Make it funny but not too harsh.",
+        "witty": "clever, witty, and intelligent. Use wordplay and smart observations.",
+        "mix": "a perfect blend of savage, funny, and witty. Keep it entertaining."
+    }
+    
+    style_instruction = style_prompts.get(roast_style, style_prompts["mix"])
+    
+    profile_summary = f"""
+Name: {profile_data.get('fullName', 'Unknown')}
+Headline: {profile_data.get('headline', 'No headline')}
+Summary: {profile_data.get('summary', 'No summary')}
+Experience: {len(profile_data.get('experience', []))} positions
+Education: {len(profile_data.get('education', []))} institutions
+Skills: {', '.join(profile_data.get('skills', [])[:10])}
+"""
+    
+    prompt = f"""You are a professional roaster who creates roasts for LinkedIn profiles. Your roasts should be {style_instruction}
+
+The roast should be in a conversational Hinglish tone (mix of Hindi and English) suitable for Indian audience. Use phrases like "bhai", "yaar", "kya baat hai", etc. Keep it fun and relatable.
+
+Here's the LinkedIn profile data:
+{profile_summary}
+
+Create a roast that's about 150-200 words. Make it entertaining and memorable. The roast should flow naturally as if you're talking to them directly."""
+    
+    message = anthropic_client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=1024,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    return message.content[0].text
+
+async def generate_audio(text: str) -> str:
+    """Generate audio using Sarvam TTS API"""
+    sarvam_api_key = os.getenv("SARVAM_API_KEY")
+    
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.post(
+            "https://api.sarvam.ai/text-to-speech",
+            json={
+                "text": text,
+                "target_language_code": "hi-IN",
+                "speaker": "meera",
+                "pitch": 0,
+                "pace": 1.15,
+                "loudness": 1.5,
+                "enable_preprocessing": True,
+                "model": "bulbul:v1"
+            },
+            headers={
+                "api-subscription-key": sarvam_api_key,
+                "Content-Type": "application/json"
+            }
+        )
+        response.raise_for_status()
+        
+        audio_data = response.content
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"roast_{timestamp}_{os.urandom(4).hex()}.mp3"
+        file_path = AUDIO_DIR / filename
+        
+        async with aiofiles.open(file_path, 'wb') as f:
+            await f.write(audio_data)
+        
+        return filename
+
+@api_router.post("/generate-roast", response_model=RoastResponse)
+async def generate_roast_endpoint(request: LinkedInProfileRequest):
+    try:
+        profile_data = await scrape_linkedin_profile(request.linkedin_url)
+        
+        if not profile_data:
+            raise HTTPException(status_code=404, detail="Could not fetch LinkedIn profile")
+        
+        roast_text = await generate_roast(profile_data, request.roast_style)
+        
+        audio_filename = await generate_audio(roast_text)
+        
+        record_data = {
+            "id": str(uuid.uuid4()),
+            "linkedin_url": request.linkedin_url,
+            "profile_data": profile_data,
+            "roast_text": roast_text,
+            "roast_style": request.roast_style,
+            "audio_filename": audio_filename,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.roast_records.insert_one(record_data)
+        
+        return RoastResponse(
+            roast_text=roast_text,
+            audio_url=f"/api/audio/{audio_filename}",
+            request_id=record_data["id"],
+            created_at=datetime.now(timezone.utc)
+        )
+    
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=500, detail=f"API Error: {str(e)}")
+    except Exception as e:
+        logging.error(f"Error generating roast: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+@api_router.get("/audio/{filename}")
+async def get_audio(filename: str):
+    file_path = AUDIO_DIR / filename
+    
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Audio file not found")
+    
+    return FileResponse(
+        file_path,
+        media_type="audio/mpeg",
+        filename=filename
+    )
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "LinkedIn Roaster API"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
-
-# Include the router in the main app
 app.include_router(api_router)
 
 app.add_middleware(
@@ -77,7 +213,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
