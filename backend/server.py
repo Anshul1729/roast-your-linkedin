@@ -53,42 +53,74 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
     """Scrape LinkedIn profile using Apify API"""
     apify_token = os.getenv("APIFY_API_TOKEN")
     
-    async with httpx.AsyncClient(timeout=120.0) as client:
-        response = await client.post(
-            f"https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs?token={apify_token}",
-            json={"profileUrls": [linkedin_url]},
-            headers={"Content-Type": "application/json"}
-        )
-        response.raise_for_status()
-        run_data = response.json()
-        run_id = run_data["data"]["id"]
-        
-        for _ in range(30):
-            await asyncio.sleep(3)
-            status_response = await client.get(
-                f"https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs/{run_id}?token={apify_token}"
+    try:
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            response = await client.post(
+                f"https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs?token={apify_token}",
+                json={"profileUrls": [linkedin_url]},
+                headers={"Content-Type": "application/json"}
             )
-            status_response.raise_for_status()
-            status_data = status_response.json()
             
-            if status_data["data"]["status"] == "SUCCEEDED":
-                dataset_id = status_data["data"]["defaultDatasetId"]
-                break
-            elif status_data["data"]["status"] in ["FAILED", "ABORTED", "TIMED-OUT"]:
-                raise Exception(f"Apify run failed with status: {status_data['data']['status']}")
-        else:
-            raise Exception("Apify scraping timed out")
-        
-        result_response = await client.get(
-            f"https://api.apify.com/v2/datasets/{dataset_id}/items?token={apify_token}"
-        )
-        result_response.raise_for_status()
-        profile_data = result_response.json()
-        
-        if profile_data and len(profile_data) > 0:
-            return profile_data[0]
-        else:
-            return {}
+            # Check for API limit errors
+            if response.status_code == 429:
+                raise HTTPException(
+                    status_code=429, 
+                    detail="Apify API rate limit reached. This is a free tier limitation. Please try again in a few minutes."
+                )
+            elif response.status_code == 402:
+                raise HTTPException(
+                    status_code=402,
+                    detail="Apify API credits exhausted. The free API quota has been used up. Please try again later or contact support."
+                )
+            
+            response.raise_for_status()
+            run_data = response.json()
+            run_id = run_data["data"]["id"]
+            
+            for _ in range(30):
+                await asyncio.sleep(3)
+                status_response = await client.get(
+                    f"https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs/{run_id}?token={apify_token}"
+                )
+                status_response.raise_for_status()
+                status_data = status_response.json()
+                
+                if status_data["data"]["status"] == "SUCCEEDED":
+                    dataset_id = status_data["data"]["defaultDatasetId"]
+                    break
+                elif status_data["data"]["status"] in ["FAILED", "ABORTED", "TIMED-OUT"]:
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"LinkedIn profile scraping failed. Status: {status_data['data']['status']}. Please check the LinkedIn URL and try again."
+                    )
+            else:
+                raise HTTPException(
+                    status_code=504,
+                    detail="Profile scraping is taking too long. The LinkedIn profile might be private or unavailable. Please try another profile."
+                )
+            
+            result_response = await client.get(
+                f"https://api.apify.com/v2/datasets/{dataset_id}/items?token={apify_token}"
+            )
+            result_response.raise_for_status()
+            profile_data = result_response.json()
+            
+            if profile_data and len(profile_data) > 0:
+                return profile_data[0]
+            else:
+                return {}
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 429:
+            raise HTTPException(
+                status_code=429,
+                detail="Apify API rate limit reached. This is a free tier limitation. Please try again in a few minutes."
+            )
+        elif e.response.status_code == 402:
+            raise HTTPException(
+                status_code=402,
+                detail="Apify API credits exhausted. The free API quota has been used up. Please try again later."
+            )
+        raise
 
 async def generate_roast(profile_data: dict, roast_style: str) -> str:
     """Generate roast text using Claude"""
