@@ -95,10 +95,10 @@ async def generate_roast(profile_data: dict, roast_style: str) -> str:
     anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
     
     style_prompts = {
-        "savage": "brutal, ruthless, and savage. Don't hold back. Roast them hard.",
-        "funny": "hilarious and light-hearted. Make it funny but not too harsh.",
-        "witty": "clever, witty, and intelligent. Use wordplay and smart observations.",
-        "mix": "a perfect blend of savage, funny, and witty. Keep it entertaining."
+        "savage": "absolutely BRUTAL and RUTHLESS. Destroy them completely. Hold NOTHING back. Make them question their entire existence. Be devastatingly harsh, cruel, and merciless. This is maximum damage mode.",
+        "funny": "hilariously SAVAGE and cutting. Roast them to ashes while making it comedic gold. Mock everything mercilessly but keep it entertaining. Dark humor is encouraged.",
+        "witty": "intellectually DEVASTATING and razor-sharp. Use your intelligence as a weapon to dismantle them piece by piece. Surgical precision in destruction. Make them feel utterly inadequate.",
+        "mix": "an EXTREME combination of savage brutality, dark humor, and intellectual destruction. Pull no punches. This is total annihilation."
     }
     
     style_instruction = style_prompts.get(roast_style, style_prompts["mix"])
@@ -112,14 +112,20 @@ Education: {len(profile_data.get('education', []))} institutions
 Skills: {', '.join(profile_data.get('skills', [])[:10])}
 """
     
-    prompt = f"""You are a professional roaster who creates roasts for LinkedIn profiles. Your roasts should be {style_instruction}
+    prompt = f"""You are a RUTHLESS roaster who absolutely DESTROYS LinkedIn profiles. Your roasts should be {style_instruction}
 
-The roast should be in a conversational Hinglish tone (mix of Hindi and English) suitable for Indian audience. Use phrases like "bhai", "yaar", "kya baat hai", etc. Keep it fun and relatable.
+IMPORTANT RULES:
+- Write ONLY in English. NO Hindi, NO Hinglish.
+- Be EXTREMELY harsh and brutal. This is not gentle roasting.
+- Attack their profile, achievements, skills, experience - everything is fair game.
+- Make them feel utterly destroyed.
+- Be creative and devastating in your insults.
+- Keep it around 120-150 words for maximum impact.
 
 Here's the LinkedIn profile data:
 {profile_summary}
 
-Create a roast that's about 150-200 words. Make it entertaining and memorable. The roast should flow naturally as if you're talking to them directly."""
+Now DESTROY this profile. Make it hurt. Show no mercy."""
     
     message = anthropic_client.messages.create(
         model="claude-sonnet-4-5-20250929",
