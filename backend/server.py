@@ -180,7 +180,7 @@ async def generate_audio(text: str) -> str:
         # ElevenLabs supports up to 40,000 characters for turbo v2.5
         # Our roasts are ~60-70 words (~400 chars), so no chunking needed
         
-        # Using Akshay - Indian Accent Narrator (male, Indian accent, energetic)
+        # Using custom voice ID
         voice_id = "swh0hLPsEaD50F02tIJJ"
         
         async with httpx.AsyncClient(timeout=60.0) as client:
