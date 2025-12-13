@@ -165,11 +165,17 @@ async def generate_audio(text: str) -> str:
 
 @api_router.post("/generate-roast", response_model=RoastResponse)
 async def generate_roast_endpoint(request: LinkedInProfileRequest):
+    if not request.linkedin_url or not request.linkedin_url.startswith("http"):
+        raise HTTPException(status_code=400, detail="Valid LinkedIn URL is required")
+    
+    if request.roast_style not in ["savage", "funny", "witty", "mix"]:
+        raise HTTPException(status_code=400, detail="Invalid roast style")
+    
     try:
         profile_data = await scrape_linkedin_profile(request.linkedin_url)
         
         if not profile_data:
-            raise HTTPException(status_code=404, detail="Could not fetch LinkedIn profile")
+            raise HTTPException(status_code=404, detail="Could not fetch LinkedIn profile. Please check the URL.")
         
         roast_text = await generate_roast(profile_data, request.roast_style)
         
@@ -194,11 +200,14 @@ async def generate_roast_endpoint(request: LinkedInProfileRequest):
             created_at=datetime.now(timezone.utc)
         )
     
+    except HTTPException:
+        raise
     except httpx.HTTPError as e:
-        raise HTTPException(status_code=500, detail=f"API Error: {str(e)}")
+        logger.error(f"HTTP Error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to communicate with external service. Please try again.")
     except Exception as e:
-        logging.error(f"Error generating roast: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+        logger.error(f"Error generating roast: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"An error occurred while generating the roast. Please try again.")
 
 @api_router.get("/audio/{filename}")
 async def get_audio(filename: str):
