@@ -35,6 +35,7 @@ class LinkedInProfileRequest(BaseModel):
 class RoastResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     roast_text: str
+    roast_lines: List[str]
     audio_url: str
     request_id: str
     created_at: datetime
