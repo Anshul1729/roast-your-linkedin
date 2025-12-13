@@ -147,13 +147,33 @@ async def generate_roast(profile_data: dict, roast_style: str) -> str:
     
     style_instruction = style_prompts.get(roast_style, style_prompts["mix"])
     
+    # Handle RapidAPI field names (full_name, about, experiences, educations)
+    full_name = profile_data.get('full_name', profile_data.get('fullName', 'No name'))
+    headline = profile_data.get('headline', 'No headline')
+    about = profile_data.get('about', profile_data.get('summary', 'No summary'))
+    experiences = profile_data.get('experiences', profile_data.get('experience', []))
+    educations = profile_data.get('educations', profile_data.get('education', []))
+    
+    # Extract company names from experiences
+    companies = [exp.get('company', '') for exp in experiences if exp.get('company')][:3]
+    company_text = ', '.join(companies) if companies else 'No companies listed'
+    
+    # Extract schools from educations
+    schools = [edu.get('school', '') for edu in educations if edu.get('school')][:2]
+    school_text = ', '.join(schools) if schools else 'No education listed'
+    
+    # Get current job title
+    current_job = experiences[0].get('title', 'No job title') if experiences else 'No job title'
+    
     profile_summary = f"""
-Name: {profile_data.get('fullName', 'Unknown')}
-Headline: {profile_data.get('headline', 'No headline')}
-Summary: {profile_data.get('summary', 'No summary')}
-Experience: {len(profile_data.get('experience', []))} positions
-Education: {len(profile_data.get('education', []))} institutions
-Skills: {', '.join(profile_data.get('skills', [])[:10])}
+Name: {full_name}
+Current Job: {current_job}
+Headline: {headline}
+About: {about[:200] if about != 'No summary' else about}
+Companies: {company_text}
+Education: {school_text}
+Total Experience: {len(experiences)} positions
+Total Education: {len(educations)} institutions
 """
     
     prompt = f"""You are a very RUTHLESS roaster. Your roasts should be {style_instruction}
