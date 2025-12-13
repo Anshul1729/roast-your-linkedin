@@ -107,9 +107,38 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
             profile_data = result_response.json()
             
             if profile_data and len(profile_data) > 0:
-                return profile_data[0]
+                result = profile_data[0]
+                
+                # Check if Apify returned an error instead of profile data
+                if isinstance(result, dict) and 'error' in result:
+                    error_msg = result['error']
+                    logger.error(f"Apify returned error: {error_msg}")
+                    
+                    if "free Apify plan" in error_msg or "not via other methods" in error_msg:
+                        raise HTTPException(
+                            status_code=402,
+                            detail="LinkedIn scraping failed: Apify free plan doesn't support API access. Please upgrade to a paid Apify plan or use a different scraping method."
+                        )
+                    else:
+                        raise HTTPException(
+                            status_code=500,
+                            detail=f"LinkedIn scraping failed: {error_msg}"
+                        )
+                
+                # Validate that we have actual profile data
+                if not result.get('fullName') and not result.get('headline') and not result.get('summary'):
+                    logger.warning(f"Profile data is empty or invalid: {result}")
+                    raise HTTPException(
+                        status_code=404,
+                        detail="LinkedIn profile appears to be empty or inaccessible. The profile might be private, deleted, or the URL is incorrect."
+                    )
+                
+                return result
             else:
-                return {}
+                raise HTTPException(
+                    status_code=404,
+                    detail="No profile data received from LinkedIn. The profile might be private or doesn't exist."
+                )
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 429:
             raise HTTPException(
