@@ -200,11 +200,11 @@ function App() {
 
                 <div className="mb-6 md:mb-8 min-h-[150px] md:min-h-[200px]" data-testid="roast-text">
                   {isPlaying ? (
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4">
                       {roastData.roast_lines.map((line, index) => (
                         <div
                           key={index}
-                          className={`text-xl leading-relaxed transition-all duration-500 ${
+                          className={`text-base md:text-xl leading-relaxed transition-all duration-500 ${
                             index <= currentLineIndex
                               ? "text-[#FF2E00] opacity-100 scale-100"
                               : "text-[#666666] opacity-30 scale-95"
@@ -215,7 +215,7 @@ function App() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-[#E0E0E0] leading-relaxed text-lg whitespace-pre-wrap">
+                    <div className="text-[#E0E0E0] leading-relaxed text-base md:text-lg whitespace-pre-wrap">
                       {roastData.roast_text}
                     </div>
                   )}
