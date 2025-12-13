@@ -215,6 +215,8 @@ async def generate_audio(text: str) -> str:
         voice_id = "swh0hLPsEaD50F02tIJJ"
         
         async with httpx.AsyncClient(timeout=60.0) as client:
+            # Calculate optimal speed for ~30 second audio
+            # Average speaking rate: ~150 words/min, we want faster for roasting
             payload = {
                 "text": text,
                 "model_id": "eleven_turbo_v2_5",
@@ -224,7 +226,8 @@ async def generate_audio(text: str) -> str:
                     "style": 0.8,  # High stylistic variation for roasting energy
                     "use_speaker_boost": True  # Enhanced clarity and volume
                 },
-                "output_format": "mp3_44100_128"  # High quality MP3
+                "output_format": "mp3_44100_128",  # High quality MP3
+                "speed": 1.1  # 10% faster than normal speed
             }
             
             logger.info(f"Calling ElevenLabs TTS API with voice: {voice_id}")
