@@ -94,17 +94,19 @@ function App() {
         if (navigator.share && navigator.canShare({ files: [file] })) {
           await navigator.share({
             title: "LinkedIn Roast",
-            text: "Check out this LinkedIn roast!",
+            text: "Check out this LinkedIn roast! 🔥\n\nGet yours at: https://careers-roast.emergent.host/",
             files: [file],
           });
         } else {
-          // Fallback: copy text
-          navigator.clipboard.writeText(roastData.roast_text);
+          // Fallback: copy text with URL
+          const shareText = `${roastData.roast_text}\n\nGet your LinkedIn roast at: https://careers-roast.emergent.host/`;
+          navigator.clipboard.writeText(shareText);
           toast.success("Roast text copied to clipboard!");
         }
       } catch (err) {
         console.error("Share failed:", err);
-        navigator.clipboard.writeText(roastData.roast_text);
+        const shareText = `${roastData.roast_text}\n\nGet your LinkedIn roast at: https://careers-roast.emergent.host/`;
+        navigator.clipboard.writeText(shareText);
         toast.success("Roast text copied to clipboard!");
       }
     }
