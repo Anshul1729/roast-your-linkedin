@@ -133,10 +133,9 @@ async def generate_audio(text: str) -> str:
     """Generate audio using Sarvam TTS API"""
     sarvam_api_key = os.getenv("SARVAM_API_KEY")
     
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(
-            "https://api.sarvam.ai/text-to-speech",
-            json={
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            payload = {
                 "text": text,
                 "target_language_code": "hi-IN",
                 "speaker": "anushka",
@@ -145,23 +144,43 @@ async def generate_audio(text: str) -> str:
                 "loudness": 1.5,
                 "enable_preprocessing": True,
                 "model": "bulbul:v2"
-            },
-            headers={
-                "api-subscription-key": sarvam_api_key,
-                "Content-Type": "application/json"
             }
-        )
-        response.raise_for_status()
-        
-        audio_data = response.content
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"roast_{timestamp}_{os.urandom(4).hex()}.mp3"
-        file_path = AUDIO_DIR / filename
-        
-        async with aiofiles.open(file_path, 'wb') as f:
-            await f.write(audio_data)
-        
-        return filename
+            
+            logger.info(f"Calling Sarvam TTS with payload: {payload}")
+            
+            response = await client.post(
+                "https://api.sarvam.ai/text-to-speech",
+                json=payload,
+                headers={
+                    "api-subscription-key": sarvam_api_key,
+                    "Content-Type": "application/json"
+                }
+            )
+            
+            logger.info(f"Sarvam TTS response status: {response.status_code}")
+            logger.info(f"Sarvam TTS response headers: {dict(response.headers)}")
+            
+            if response.status_code != 200:
+                logger.error(f"Sarvam TTS error response: {response.text}")
+                raise Exception(f"Sarvam API returned {response.status_code}: {response.text}")
+            
+            response.raise_for_status()
+            
+            audio_data = response.content
+            logger.info(f"Received audio data: {len(audio_data)} bytes")
+            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"roast_{timestamp}_{os.urandom(4).hex()}.mp3"
+            file_path = AUDIO_DIR / filename
+            
+            async with aiofiles.open(file_path, 'wb') as f:
+                await f.write(audio_data)
+            
+            logger.info(f"Audio saved to: {file_path}")
+            return filename
+    except Exception as e:
+        logger.error(f"Error in generate_audio: {str(e)}")
+        raise
 
 @api_router.post("/generate-roast", response_model=RoastResponse)
 async def generate_roast_endpoint(request: LinkedInProfileRequest):
