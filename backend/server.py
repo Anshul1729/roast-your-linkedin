@@ -273,15 +273,15 @@ async def generate_audio(text: str) -> str:
                 logger.error(f"ElevenLabs TTS error response: {error_text}")
                 
                 # Handle specific errors
-                if "unusual_activity" in error_text or "Free Tier" in error_text:
+                if "quota_exceeded" in error_text or "unusual_activity" in error_text or "Free Tier" in error_text:
                     raise HTTPException(
                         status_code=402,
-                        detail="ElevenLabs API usage limit reached. The free tier has restrictions. Please try again later or upgrade the API plan."
+                        detail="Credit limit crossed for audio generation. Please inform the admin to add more credits."
                     )
                 elif response.status_code == 401:
                     raise HTTPException(
                         status_code=401,
-                        detail="ElevenLabs API authentication failed. Invalid API key."
+                        detail="Credit limit crossed for audio generation. Please inform the admin."
                     )
                 else:
                     raise Exception(f"ElevenLabs API returned {response.status_code}: {error_text}")
