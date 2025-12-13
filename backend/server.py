@@ -55,7 +55,7 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
     
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
-            f"https://api.apify.com/v2/acts/2SyF0bVxmgGr8IVCZ/runs?token={apify_token}",
+            f"https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs?token={apify_token}",
             json={"profileUrls": [linkedin_url]},
             headers={"Content-Type": "application/json"}
         )
@@ -64,9 +64,9 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
         run_id = run_data["data"]["id"]
         
         for _ in range(30):
-            await asyncio.sleep(2)
+            await asyncio.sleep(3)
             status_response = await client.get(
-                f"https://api.apify.com/v2/acts/2SyF0bVxmgGr8IVCZ/runs/{run_id}?token={apify_token}"
+                f"https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs/{run_id}?token={apify_token}"
             )
             status_response.raise_for_status()
             status_data = status_response.json()
