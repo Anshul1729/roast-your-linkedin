@@ -53,7 +53,7 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
     """Scrape LinkedIn profile using Apify API"""
     apify_token = os.getenv("APIFY_API_TOKEN")
     
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
             f"https://api.apify.com/v2/acts/2SyF0bVxmgGr8IVCZ/runs?token={apify_token}",
             json={"profileUrls": [linkedin_url]},
@@ -63,10 +63,24 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
         run_data = response.json()
         run_id = run_data["data"]["id"]
         
-        await asyncio.sleep(15)
+        for _ in range(30):
+            await asyncio.sleep(2)
+            status_response = await client.get(
+                f"https://api.apify.com/v2/acts/2SyF0bVxmgGr8IVCZ/runs/{run_id}?token={apify_token}"
+            )
+            status_response.raise_for_status()
+            status_data = status_response.json()
+            
+            if status_data["data"]["status"] == "SUCCEEDED":
+                dataset_id = status_data["data"]["defaultDatasetId"]
+                break
+            elif status_data["data"]["status"] in ["FAILED", "ABORTED", "TIMED-OUT"]:
+                raise Exception(f"Apify run failed with status: {status_data['data']['status']}")
+        else:
+            raise Exception("Apify scraping timed out")
         
         result_response = await client.get(
-            f"https://api.apify.com/v2/acts/2SyF0bVxmgGr8IVCZ/runs/{run_id}/dataset/items?token={apify_token}"
+            f"https://api.apify.com/v2/datasets/{dataset_id}/items?token={apify_token}"
         )
         result_response.raise_for_status()
         profile_data = result_response.json()
