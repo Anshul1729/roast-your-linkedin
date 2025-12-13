@@ -253,9 +253,12 @@ async def get_audio(filename: str):
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
     
+    # Determine media type based on extension
+    media_type = "audio/wav" if filename.endswith('.wav') else "audio/mpeg"
+    
     return FileResponse(
         file_path,
-        media_type="audio/mpeg",
+        media_type=media_type,
         filename=filename
     )
 
