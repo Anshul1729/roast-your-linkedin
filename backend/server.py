@@ -211,11 +211,12 @@ CRITICAL RULES:
 - Use questions, exclamations, dramatic pauses for impact.
 - Make it sound like spoken word, not an essay.
 - Start strong, build up, end with a devastating punchline.
+- ALWAYS end with exactly: "Okay Bye!!"
 
 Profile:
 {profile_summary}
 
-DESTROY them in 120-150 words. Keep it punchy, keep it brutal. GO."""
+DESTROY them in 120-150 words. Keep it punchy, keep it brutal. End with "Okay Bye!!" GO."""
     
     message = anthropic_client.messages.create(
         model="claude-sonnet-4-5-20250929",
