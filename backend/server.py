@@ -291,8 +291,12 @@ async def generate_roast_endpoint(request: LinkedInProfileRequest):
         
         await db.roast_records.insert_one(record_data)
         
+        # Split roast into lines for synchronized display
+        roast_lines = [line.strip() for line in roast_text.split('.') if line.strip()]
+        
         return RoastResponse(
             roast_text=roast_text,
+            roast_lines=roast_lines,
             audio_url=f"/api/audio/{audio_filename}",
             request_id=record_data["id"],
             created_at=datetime.now(timezone.utc)
