@@ -139,12 +139,12 @@ async def generate_audio(text: str) -> str:
             json={
                 "text": text,
                 "target_language_code": "hi-IN",
-                "speaker": "meera",
+                "speaker": "anushka",
                 "pitch": 0,
                 "pace": 1.15,
                 "loudness": 1.5,
                 "enable_preprocessing": True,
-                "model": "bulbul:v1"
+                "model": "bulbul:v2"
             },
             headers={
                 "api-subscription-key": sarvam_api_key,
