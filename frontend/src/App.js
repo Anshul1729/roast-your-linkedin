@@ -105,8 +105,8 @@ function App() {
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="flex items-center justify-center gap-2 md:gap-4 mb-4 md:mb-6">
+          <div className="text-center mb-6 md:mb-10">
+            <div className="flex items-center justify-center gap-2 md:gap-4">
               <Flame className="w-10 h-10 md:w-16 md:h-16 text-[#FF2E00] animate-pulse" data-testid="flame-icon" />
               <h1
                 className="text-3xl md:text-6xl font-bold uppercase tracking-widest text-white"
@@ -117,9 +117,6 @@ function App() {
               </h1>
               <Flame className="w-10 h-10 md:w-16 md:h-16 text-[#FF2E00] animate-pulse" />
             </div>
-            <p className="text-xs md:text-sm text-[#666666] mt-2 md:mt-4 px-4">
-              Enter correct LinkedIn URL
-            </p>
           </div>
 
           {!roastData && (
