@@ -57,8 +57,16 @@ class ProfileRecord(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 async def scrape_linkedin_profile(linkedin_url: str) -> dict:
-    """Scrape LinkedIn profile using RapidAPI Fresh LinkedIn Profile Data"""
+    """Scrape LinkedIn profile using RapidAPI Fresh LinkedIn Profile Data with caching"""
     rapidapi_key = os.getenv("RAPIDAPI_KEY")
+    
+    # Check cache first (7 days expiration)
+    cached_profile = await db.linkedin_cache.find_one({"linkedin_url": linkedin_url})
+    if cached_profile:
+        cache_age = datetime.now(timezone.utc) - cached_profile.get("cached_at", datetime.now(timezone.utc))
+        if cache_age.days < 7:
+            logger.info(f"Using cached profile data for {linkedin_url} (age: {cache_age.days} days)")
+            return cached_profile["profile_data"]
     
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
