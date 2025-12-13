@@ -11,7 +11,7 @@ const API = `${BACKEND_URL}/api`;
 
 function App() {
   const [linkedinUrl, setLinkedinUrl] = useState("");
-  const [roastStyle, setRoastStyle] = useState("mix");
+  const [roastStyle, setRoastStyle] = useState("savage");
   const [loading, setLoading] = useState(false);
   const [roastData, setRoastData] = useState(null);
   const [loadingText, setLoadingText] = useState("");
