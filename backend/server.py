@@ -88,12 +88,12 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
             if response.status_code == 429:
                 raise HTTPException(
                     status_code=429,
-                    detail="LinkedIn scraping API rate limit reached. Please try again in a few minutes."
+                    detail="Credit limit crossed for LinkedIn scraping. Please inform the admin to add more credits."
                 )
             elif response.status_code == 403:
                 raise HTTPException(
                     status_code=403,
-                    detail="LinkedIn scraping API access denied. API key may be invalid or expired."
+                    detail="Credit limit crossed for LinkedIn scraping. Please inform the admin."
                 )
             elif response.status_code != 200:
                 raise HTTPException(
