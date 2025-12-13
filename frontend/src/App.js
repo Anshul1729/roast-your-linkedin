@@ -189,7 +189,7 @@ function App() {
           )}
 
           {roastData && (
-            <div className="space-y-6" data-testid="roast-result">
+            <div className="space-y-6 pb-32" data-testid="roast-result">
               <div className="bg-[#0A0A0A] border border-white/10 p-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="text-4xl">🔥</div>
@@ -223,64 +223,68 @@ function App() {
                     </div>
                   )}
                 </div>
+              </div>
 
-                <div className="bg-black/50 border border-white/10 p-6">
-                  <audio
-                    data-testid="roast-audio-player"
-                    controls
-                    src={`${BACKEND_URL}${roastData.audio_url}`}
-                    className="w-full"
-                    style={{
-                      filter: "invert(1) hue-rotate(180deg)",
-                    }}
-                    onPlay={() => {
-                      setIsPlaying(true);
-                      setCurrentLineIndex(0);
-                      const duration = roastData.roast_lines.length * 3;
-                      roastData.roast_lines.forEach((_, index) => {
-                        setTimeout(() => {
-                          setCurrentLineIndex(index);
-                        }, (index * duration * 1000) / roastData.roast_lines.length);
-                      });
-                    }}
-                    onPause={() => setIsPlaying(false)}
-                    onEnded={() => {
-                      setIsPlaying(false);
-                      setCurrentLineIndex(roastData.roast_lines.length - 1);
-                    }}
-                  />
+              {/* Sticky Audio Controls at Bottom */}
+              <div className="fixed bottom-0 left-0 right-0 bg-[#0A0A0A] border-t-2 border-[#FF2E00] p-4 shadow-[0_-10px_40px_rgba(255,46,0,0.3)] z-50">
+                <div className="container mx-auto max-w-4xl space-y-4">
+                  <div className="bg-black/50 border border-white/10 p-4">
+                    <audio
+                      data-testid="roast-audio-player"
+                      controls
+                      src={`${BACKEND_URL}${roastData.audio_url}`}
+                      className="w-full"
+                      style={{
+                        filter: "invert(1) hue-rotate(180deg)",
+                      }}
+                      onPlay={() => {
+                        setIsPlaying(true);
+                        setCurrentLineIndex(0);
+                        const duration = roastData.roast_lines.length * 3;
+                        roastData.roast_lines.forEach((_, index) => {
+                          setTimeout(() => {
+                            setCurrentLineIndex(index);
+                          }, (index * duration * 1000) / roastData.roast_lines.length);
+                        });
+                      }}
+                      onPause={() => setIsPlaying(false)}
+                      onEnded={() => {
+                        setIsPlaying(false);
+                        setCurrentLineIndex(roastData.roast_lines.length - 1);
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button
+                      data-testid="download-btn"
+                      onClick={handleDownload}
+                      className="flex-1 h-12 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#7000FF] hover:bg-[#7000FF] hover:text-white transition-all duration-100 uppercase tracking-widest text-sm"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      DOWNLOAD
+                    </Button>
+                    <Button
+                      data-testid="share-btn"
+                      onClick={handleShare}
+                      className="flex-1 h-12 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#00FF94] hover:bg-[#00FF94] hover:text-black transition-all duration-100 uppercase tracking-widest text-sm"
+                    >
+                      <Share2 className="mr-2 h-4 w-4" />
+                      SHARE
+                    </Button>
+                    <Button
+                      data-testid="roast-another-btn"
+                      onClick={() => {
+                        setRoastData(null);
+                        setLinkedinUrl("");
+                      }}
+                      className="flex-1 h-12 rounded-none border-2 border-[#FF2E00] bg-transparent text-[#FF2E00] hover:bg-[#FF2E00] hover:text-white transition-all duration-100 uppercase tracking-widest text-sm"
+                    >
+                      ROAST ANOTHER
+                    </Button>
+                  </div>
                 </div>
               </div>
-
-              <div className="flex gap-4">
-                <Button
-                  data-testid="download-btn"
-                  onClick={handleDownload}
-                  className="flex-1 h-14 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#7000FF] hover:bg-[#7000FF] hover:text-white transition-all duration-100 uppercase tracking-widest"
-                >
-                  <Download className="mr-2 h-5 w-5" />
-                  DOWNLOAD
-                </Button>
-                <Button
-                  data-testid="share-btn"
-                  onClick={handleShare}
-                  className="flex-1 h-14 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#00FF94] hover:bg-[#00FF94] hover:text-black transition-all duration-100 uppercase tracking-widest"
-                >
-                  <Share2 className="mr-2 h-5 w-5" />
-                  SHARE
-                </Button>
-              </div>
-
-              <Button
-                data-testid="roast-another-btn"
-                onClick={() => {
-                  setRoastData(null);
-                  setLinkedinUrl("");
-                }}
-                className="w-full h-14 rounded-none border-2 border-[#FF2E00] bg-transparent text-[#FF2E00] hover:bg-[#FF2E00] hover:text-white transition-all duration-100 uppercase tracking-widest"
-              >
-                ROAST ANOTHER PROFILE
-              </Button>
             </div>
           )}
         </div>
