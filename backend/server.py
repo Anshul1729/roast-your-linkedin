@@ -188,7 +188,7 @@ async def generate_audio(text: str) -> str:
             logger.info(f"Decoded audio data: {len(audio_data)} bytes (~{len(audio_data)/1024:.1f} KB)")
             
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"roast_{timestamp}_{os.urandom(4).hex()}.mp3"
+            filename = f"roast_{timestamp}_{os.urandom(4).hex()}.wav"
             file_path = AUDIO_DIR / filename
             
             async with aiofiles.open(file_path, 'wb') as f:
