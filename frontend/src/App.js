@@ -15,6 +15,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [roastData, setRoastData] = useState(null);
   const [loadingText, setLoadingText] = useState("");
+  const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const loadingMessages = [
     "Stalking their profile...",
