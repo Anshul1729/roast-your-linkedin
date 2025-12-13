@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="flameGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF2E00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FF6B00;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFB800;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100" height="100" fill="#0A0A0A" rx="20"/>
+  
+  <!-- Flame -->
+  <path d="M 50 15 Q 45 25, 40 35 Q 38 45, 42 55 Q 45 62, 50 65 Q 55 62, 58 55 Q 62 45, 60 35 Q 55 25, 50 15 Z" 
+        fill="url(#flameGradient)" 
+        stroke="#FF2E00" 
+        stroke-width="1.5"/>
+  
+  <!-- Inner flame highlight -->
+  <path d="M 50 25 Q 48 30, 47 38 Q 46 45, 48 52 Q 49 56, 50 58 Q 51 56, 52 52 Q 54 45, 53 38 Q 52 30, 50 25 Z" 
+        fill="#FFE600" 
+        opacity="0.8"/>
+  
+  <!-- L letter for LinkedIn -->
+  <text x="50" y="85" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle">L</text>
+</svg>
