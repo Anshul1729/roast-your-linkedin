@@ -85,18 +85,27 @@ function App() {
 
   const handleShare = async () => {
     if (roastData) {
-      if (navigator.share) {
-        try {
+      try {
+        const audioUrl = `${BACKEND_URL}${roastData.audio_url}`;
+        const response = await fetch(audioUrl);
+        const blob = await response.blob();
+        const file = new File([blob], 'linkedin_roast.mp3', { type: 'audio/mpeg' });
+
+        if (navigator.share && navigator.canShare({ files: [file] })) {
           await navigator.share({
             title: "LinkedIn Roast",
-            text: roastData.roast_text,
+            text: "Check out this LinkedIn roast!",
+            files: [file],
           });
-        } catch (err) {
-          console.error("Share failed:", err);
+        } else {
+          // Fallback: copy text
+          navigator.clipboard.writeText(roastData.roast_text);
+          toast.success("Roast text copied to clipboard!");
         }
-      } else {
+      } catch (err) {
+        console.error("Share failed:", err);
         navigator.clipboard.writeText(roastData.roast_text);
-        toast.success("Roast copied to clipboard!");
+        toast.success("Roast text copied to clipboard!");
       }
     }
   };
