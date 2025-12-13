@@ -353,6 +353,63 @@ function App() {
       </div>
 
       <Toaster position="top-center" theme="dark" />
+      
+      {/* Tip Popup */}
+      {showTipPopup && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
+          <div className="bg-[#0A0A0A] border-2 border-[#FF2E00] p-6 md:p-8 max-w-md w-full relative">
+            <button
+              onClick={() => {
+                setShowTipPopup(false);
+                localStorage.setItem('tipShown', 'true');
+              }}
+              className="absolute top-4 right-4 text-[#666666] hover:text-white transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <h3 className="text-xl md:text-2xl font-bold text-[#FF2E00] mb-4 uppercase tracking-wider" style={{ fontFamily: "'Anton', sans-serif" }}>
+              Hey! 🔥
+            </h3>
+            
+            <p className="text-[#E0E0E0] mb-4 text-sm md:text-base">
+              Looks like you're enjoying the roasts 😄
+            </p>
+            
+            <p className="text-[#AAAAAA] mb-6 text-sm">
+              If this has been fun, a small tip helps keep the site running.
+            </p>
+            
+            <div className="bg-black/50 border border-white/20 p-4 rounded flex items-center justify-between mb-6">
+              <div>
+                <div className="text-xs text-[#666666] mb-1">UPI ID</div>
+                <div className="text-[#E0E0E0] font-mono">anshul.sbi1@ybl</div>
+              </div>
+              <Button
+                onClick={() => {
+                  navigator.clipboard.writeText('anshul.sbi1@ybl');
+                  toast.success('UPI ID copied!');
+                }}
+                className="h-10 px-4 rounded-none border border-[#FF2E00] bg-transparent text-[#FF2E00] hover:bg-[#FF2E00] hover:text-white transition-all duration-100 text-xs uppercase tracking-wider"
+              >
+                COPY
+              </Button>
+            </div>
+            
+            <Button
+              onClick={() => {
+                setShowTipPopup(false);
+                localStorage.setItem('tipShown', 'true');
+              }}
+              className="w-full h-12 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#FF2E00] hover:text-[#FF2E00] transition-all duration-100 uppercase tracking-widest text-sm"
+            >
+              MAYBE LATER
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
