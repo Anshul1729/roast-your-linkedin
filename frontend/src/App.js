@@ -17,6 +17,7 @@ function App() {
   const [loadingText, setLoadingText] = useState("");
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showTipPopup, setShowTipPopup] = useState(false);
 
   const loadingMessages = [
     "Stalking their profile...",
