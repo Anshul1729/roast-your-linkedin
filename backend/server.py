@@ -170,93 +170,79 @@ DESTROY them in 60-70 words. Short punchy lines. GO."""
     return message.content[0].text
 
 async def generate_audio(text: str) -> str:
-    """Generate audio using Sarvam TTS API"""
-    import base64
-    import json
-    import re
-    
-    sarvam_api_key = os.getenv("SARVAM_API_KEY")
+    """Generate audio using ElevenLabs TTS API"""
+    elevenlabs_api_key = os.getenv("ELEVENLABS_API_KEY")
     
     try:
         logger.info(f"Input text length: {len(text)} characters")
+        logger.info(f"Generating audio with ElevenLabs TTS")
         
-        # Split text into chunks of max 450 characters (to be safe under 500 limit)
-        # Split by sentences to avoid cutting mid-sentence
-        sentences = re.split(r'(?<=[.!?])\s+', text)
-        chunks = []
-        current_chunk = ""
+        # ElevenLabs supports up to 40,000 characters for turbo v2.5
+        # Our roasts are ~60-70 words (~400 chars), so no chunking needed
         
-        for sentence in sentences:
-            if len(current_chunk) + len(sentence) + 1 <= 450:
-                current_chunk += (" " if current_chunk else "") + sentence
-            else:
-                if current_chunk:
-                    chunks.append(current_chunk.strip())
-                current_chunk = sentence
-        
-        if current_chunk:
-            chunks.append(current_chunk.strip())
-        
-        logger.info(f"Split into {len(chunks)} chunks")
-        
-        all_audio_data = b""
+        # Using Sarah voice (EXAVITQu4vr4xnSDxMaL) - clear and expressive
+        voice_id = "EXAVITQu4vr4xnSDxMaL"
         
         async with httpx.AsyncClient(timeout=60.0) as client:
-            for i, chunk in enumerate(chunks):
-                logger.info(f"Processing chunk {i+1}/{len(chunks)}, length: {len(chunk)}")
-                
-                payload = {
-                    "inputs": [chunk],
-                    "target_language_code": "en-IN",
-                    "speaker": "anushka",
-                    "pitch": 0,
-                    "pace": 1.15,
-                    "loudness": 1.5,
-                    "enable_preprocessing": True,
-                    "model": "bulbul:v2"
+            payload = {
+                "text": text,
+                "model_id": "eleven_turbo_v2_5",
+                "voice_settings": {
+                    "stability": 0.4,  # Lower for more dynamic/expressive
+                    "similarity_boost": 0.75,  # Higher for better voice match
+                    "style": 0.6,  # Add some stylistic variation
+                    "use_speaker_boost": True  # Enhanced clarity
                 }
+            }
+            
+            logger.info(f"Calling ElevenLabs TTS API with voice: {voice_id}")
+            
+            response = await client.post(
+                f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+                json=payload,
+                headers={
+                    "xi-api-key": elevenlabs_api_key,
+                    "Content-Type": "application/json"
+                }
+            )
+            
+            logger.info(f"ElevenLabs TTS response status: {response.status_code}")
+            
+            if response.status_code != 200:
+                error_text = response.text
+                logger.error(f"ElevenLabs TTS error response: {error_text}")
                 
-                response = await client.post(
-                    "https://api.sarvam.ai/text-to-speech",
-                    json=payload,
-                    headers={
-                        "api-subscription-key": sarvam_api_key,
-                        "Content-Type": "application/json"
-                    }
-                )
-                
-                if response.status_code != 200:
-                    logger.error(f"Sarvam TTS error response: {response.text}")
-                    raise Exception(f"Sarvam API returned {response.status_code}: {response.text}")
-                
-                response_data = response.json()
-                
-                if "audios" not in response_data or not response_data["audios"]:
-                    raise Exception("No audio data in Sarvam response")
-                
-                base64_audio = response_data["audios"][0]
-                chunk_audio = base64.b64decode(base64_audio)
-                
-                # For multiple chunks, we need to concatenate WAV files properly
-                # Skip WAV header for chunks after the first one (44 bytes)
-                if i == 0:
-                    all_audio_data += chunk_audio
+                # Handle specific errors
+                if "unusual_activity" in error_text or "Free Tier" in error_text:
+                    raise HTTPException(
+                        status_code=402,
+                        detail="ElevenLabs API usage limit reached. The free tier has restrictions. Please try again later or upgrade the API plan."
+                    )
+                elif response.status_code == 401:
+                    raise HTTPException(
+                        status_code=401,
+                        detail="ElevenLabs API authentication failed. Invalid API key."
+                    )
                 else:
-                    all_audio_data += chunk_audio[44:]  # Skip WAV header
-                
-                logger.info(f"Chunk {i+1} audio: {len(chunk_audio)} bytes")
-        
-        logger.info(f"Total audio data: {len(all_audio_data)} bytes (~{len(all_audio_data)/1024:.1f} KB)")
-        
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"roast_{timestamp}_{os.urandom(4).hex()}.wav"
-        file_path = AUDIO_DIR / filename
-        
-        async with aiofiles.open(file_path, 'wb') as f:
-            await f.write(all_audio_data)
-        
-        logger.info(f"Audio saved to: {file_path}")
-        return filename
+                    raise Exception(f"ElevenLabs API returned {response.status_code}: {error_text}")
+            
+            response.raise_for_status()
+            
+            # ElevenLabs returns raw MP3 audio bytes
+            audio_data = response.content
+            logger.info(f"Received audio data: {len(audio_data)} bytes (~{len(audio_data)/1024:.1f} KB)")
+            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"roast_{timestamp}_{os.urandom(4).hex()}.mp3"
+            file_path = AUDIO_DIR / filename
+            
+            async with aiofiles.open(file_path, 'wb') as f:
+                await f.write(audio_data)
+            
+            logger.info(f"Audio saved to: {file_path}")
+            return filename
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error in generate_audio: {str(e)}")
         raise
