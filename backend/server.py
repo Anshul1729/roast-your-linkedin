@@ -131,6 +131,9 @@ Create a roast that's about 150-200 words. Make it entertaining and memorable. T
 
 async def generate_audio(text: str) -> str:
     """Generate audio using Sarvam TTS API"""
+    import base64
+    import json
+    
     sarvam_api_key = os.getenv("SARVAM_API_KEY")
     
     try:
@@ -166,8 +169,20 @@ async def generate_audio(text: str) -> str:
             
             response.raise_for_status()
             
-            audio_data = response.content
-            logger.info(f"Received audio data: {len(audio_data)} bytes")
+            # Parse JSON response
+            response_data = response.json()
+            logger.info(f"Sarvam response keys: {response_data.keys()}")
+            
+            # Get base64 encoded audio from response
+            if "audios" not in response_data or not response_data["audios"]:
+                raise Exception("No audio data in Sarvam response")
+            
+            base64_audio = response_data["audios"][0]
+            logger.info(f"Received base64 audio length: {len(base64_audio)} chars")
+            
+            # Decode base64 to get actual audio bytes
+            audio_data = base64.b64decode(base64_audio)
+            logger.info(f"Decoded audio data: {len(audio_data)} bytes")
             
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"roast_{timestamp}_{os.urandom(4).hex()}.mp3"
