@@ -52,6 +52,14 @@ function App() {
       clearInterval(loadingInterval);
       setRoastData(response.data);
       toast.success("ROASTED! 🔥");
+      
+      // Increment roast counter and check if should show tip popup
+      const roastCount = parseInt(localStorage.getItem('roastCount') || '0') + 1;
+      localStorage.setItem('roastCount', roastCount.toString());
+      
+      if (roastCount >= 3 && !localStorage.getItem('tipShown')) {
+        setTimeout(() => setShowTipPopup(true), 2000);
+      }
     } catch (error) {
       clearInterval(loadingInterval);
       console.error("Error:", error);
