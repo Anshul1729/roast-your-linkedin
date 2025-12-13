@@ -224,7 +224,13 @@ DESTROY them in 120-150 words. Keep it punchy, keep it brutal. End with "Okay By
         messages=[{"role": "user", "content": prompt}]
     )
     
-    return message.content[0].text
+    roast_text = message.content[0].text
+    
+    # Ensure roast always ends with "Okay Bye!!"
+    if not roast_text.strip().endswith("Okay Bye!!"):
+        roast_text = roast_text.strip() + " Okay Bye!!"
+    
+    return roast_text
 
 async def generate_audio(text: str) -> str:
     """Generate audio using ElevenLabs TTS API"""
