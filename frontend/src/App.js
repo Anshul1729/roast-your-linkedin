@@ -85,6 +85,8 @@ function App() {
 
   const handleShare = async () => {
     if (roastData) {
+      const shareText = `${roastData.roast_text}\n\nGet your LinkedIn roast at: https://careers-roast.emergent.host/`;
+      
       try {
         const audioUrl = `${BACKEND_URL}${roastData.audio_url}`;
         const response = await fetch(audioUrl);
@@ -97,17 +99,48 @@ function App() {
             text: "Check out this LinkedIn roast! 🔥\n\nGet yours at: https://careers-roast.emergent.host/",
             files: [file],
           });
-        } else {
-          // Fallback: copy text with URL
-          const shareText = `${roastData.roast_text}\n\nGet your LinkedIn roast at: https://careers-roast.emergent.host/`;
-          navigator.clipboard.writeText(shareText);
-          toast.success("Roast text copied to clipboard!");
+          return;
         }
       } catch (err) {
-        console.error("Share failed:", err);
-        const shareText = `${roastData.roast_text}\n\nGet your LinkedIn roast at: https://careers-roast.emergent.host/`;
-        navigator.clipboard.writeText(shareText);
-        toast.success("Roast text copied to clipboard!");
+        console.error("File share failed:", err);
+      }
+      
+      // Fallback: try text-only share first, then clipboard
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: "LinkedIn Roast",
+            text: shareText,
+          });
+          return;
+        }
+      } catch (err) {
+        console.error("Text share failed:", err);
+      }
+      
+      // Final fallback: clipboard with focus management
+      try {
+        // Ensure document has focus
+        window.focus();
+        await navigator.clipboard.writeText(shareText);
+        toast.success("Roast copied to clipboard!");
+      } catch (clipboardErr) {
+        console.error("Clipboard failed:", clipboardErr);
+        // Last resort: show text in alert or use old-school method
+        const textArea = document.createElement('textarea');
+        textArea.value = shareText;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          toast.success("Roast copied to clipboard!");
+        } catch (err) {
+          toast.error("Please manually copy the roast text");
+        }
+        document.body.removeChild(textArea);
       }
     }
   };
