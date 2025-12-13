@@ -256,10 +256,10 @@ async def generate_audio(text: str) -> str:
                     "stability": 0.3,  # Lower for more dynamic/aggressive delivery
                     "similarity_boost": 0.8,  # Higher for better voice match
                     "style": 0.8,  # High stylistic variation for roasting energy
-                    "use_speaker_boost": True  # Enhanced clarity and volume
+                    "use_speaker_boost": True,  # Enhanced clarity and volume
+                    "speed": 1.1  # 10% faster than normal speed
                 },
-                "output_format": "mp3_44100_128",  # High quality MP3
-                "speed": 1.1  # 10% faster than normal speed
+                "output_format": "mp3_44100_128"  # High quality MP3
             }
             
             logger.info(f"Calling ElevenLabs TTS API with voice: {voice_id}")
