@@ -171,12 +171,12 @@ function App() {
                 data-testid="generate-roast-btn"
                 onClick={handleGenerateRoast}
                 disabled={loading}
-                className="w-full h-16 text-lg rounded-none border-2 border-[#FF2E00] bg-transparent text-[#FF2E00] hover:bg-[#FF2E00] hover:text-white transition-all duration-100 uppercase tracking-widest shadow-[0_0_20px_rgba(255,46,0,0.3)] hover:shadow-[0_0_40px_rgba(255,46,0,0.6)]"
+                className="w-full h-12 md:h-16 text-sm md:text-lg rounded-none border-2 border-[#FF2E00] bg-transparent text-[#FF2E00] hover:bg-[#FF2E00] hover:text-white transition-all duration-100 uppercase tracking-widest shadow-[0_0_20px_rgba(255,46,0,0.3)] hover:shadow-[0_0_40px_rgba(255,46,0,0.6)]"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    {loadingText}
+                    <Loader2 className="mr-2 h-4 md:h-5 w-4 md:w-5 animate-spin" />
+                    <span className="text-xs md:text-sm">{loadingText}</span>
                   </>
                 ) : (
                   "GENERATE ROAST"
