@@ -137,9 +137,12 @@ async def generate_audio(text: str) -> str:
     sarvam_api_key = os.getenv("SARVAM_API_KEY")
     
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        logger.info(f"Input text length: {len(text)} characters")
+        logger.info(f"Input text: {text[:200]}...")
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
             payload = {
-                "text": text,
+                "inputs": [text],
                 "target_language_code": "hi-IN",
                 "speaker": "anushka",
                 "pitch": 0,
@@ -149,7 +152,7 @@ async def generate_audio(text: str) -> str:
                 "model": "bulbul:v2"
             }
             
-            logger.info(f"Calling Sarvam TTS with payload: {payload}")
+            logger.info(f"Calling Sarvam TTS with payload (text length: {len(text)})")
             
             response = await client.post(
                 "https://api.sarvam.ai/text-to-speech",
@@ -182,7 +185,7 @@ async def generate_audio(text: str) -> str:
             
             # Decode base64 to get actual audio bytes
             audio_data = base64.b64decode(base64_audio)
-            logger.info(f"Decoded audio data: {len(audio_data)} bytes")
+            logger.info(f"Decoded audio data: {len(audio_data)} bytes (~{len(audio_data)/1024:.1f} KB)")
             
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"roast_{timestamp}_{os.urandom(4).hex()}.mp3"
@@ -191,7 +194,7 @@ async def generate_audio(text: str) -> str:
             async with aiofiles.open(file_path, 'wb') as f:
                 await f.write(audio_data)
             
-            logger.info(f"Audio saved to: {file_path}")
+            logger.info(f"Audio saved to: {file_path} (size: {len(audio_data)} bytes)")
             return filename
     except Exception as e:
         logger.error(f"Error in generate_audio: {str(e)}")
