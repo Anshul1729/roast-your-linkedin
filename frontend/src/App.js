@@ -104,23 +104,20 @@ function App() {
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <Flame className="w-16 h-16 text-[#FF2E00] animate-pulse" data-testid="flame-icon" />
+          <div className="text-center mb-8 md:mb-12">
+            <div className="flex items-center justify-center gap-2 md:gap-4 mb-4 md:mb-6">
+              <Flame className="w-10 h-10 md:w-16 md:h-16 text-[#FF2E00] animate-pulse" data-testid="flame-icon" />
               <h1
-                className="text-6xl font-bold uppercase tracking-widest text-white"
+                className="text-3xl md:text-6xl font-bold uppercase tracking-widest text-white"
                 style={{ fontFamily: "'Anton', sans-serif" }}
                 data-testid="app-title"
               >
-                THE ROAST
+                LINKEDIN ROAST
               </h1>
-              <Flame className="w-16 h-16 text-[#FF2E00] animate-pulse" />
+              <Flame className="w-10 h-10 md:w-16 md:h-16 text-[#FF2E00] animate-pulse" />
             </div>
-            <h2 className="text-xl text-[#666666] uppercase tracking-wider">
-              TERMINAL
-            </h2>
-            <p className="text-sm text-[#666666] mt-4">
-              Enter karo LinkedIn profile, roast ready karo
+            <p className="text-xs md:text-sm text-[#666666] mt-2 md:mt-4 px-4">
+              Enter correct LinkedIn URL
             </p>
           </div>
 
