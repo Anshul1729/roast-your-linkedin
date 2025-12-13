@@ -145,7 +145,7 @@ Education: {len(profile_data.get('education', []))} institutions
 Skills: {', '.join(profile_data.get('skills', [])[:10])}
 """
     
-    prompt = f"""You are a RUTHLESS roaster. Your roasts should be {style_instruction}
+    prompt = f"""You are a very RUTHLESS roaster. Your roasts should be {style_instruction}
 
 CRITICAL RULES:
 - Write ONLY in English. NO other languages.
