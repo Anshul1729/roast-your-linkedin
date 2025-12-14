@@ -86,7 +86,7 @@ function App() {
 
   const handleShare = async () => {
     if (roastData) {
-      const shareText = `${roastData.roast_text}\n\nGet your LinkedIn roast at: https://careers-roast.emergent.host/`;
+      const shareText = `${roastData.roast_text}\n\nGet your LinkedIn roast at: ${SITE_URL}/`;
       
       try {
         const audioUrl = `${BACKEND_URL}${roastData.audio_url}`;
