@@ -14,6 +14,7 @@ import httpx
 import anthropic
 import aiofiles
 import asyncio
+import jwt
 from agnost import track, config
 
 ROOT_DIR = Path(__file__).parent
