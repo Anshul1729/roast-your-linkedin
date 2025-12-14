@@ -27,9 +27,29 @@ db = client[os.environ['DB_NAME']]
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
+# Helper function to decode JWT token
+def decode_jwt(auth_header):
+    """Decode JWT token from Authorization header"""
+    try:
+        if auth_header and auth_header.startswith('Bearer '):
+            token = auth_header.split(' ')[1]
+            decoded = jwt.decode(token, options={"verify_signature": False})
+            return decoded.get('sub') or decoded.get('user_id') or decoded.get('id', 'anonymous')
+    except Exception as e:
+        logger.debug(f"JWT decode failed: {str(e)}")
+    return 'anonymous'
+
 # Add Agnost tracking
 track(app, "c997e4e3-b251-4853-8ff8-801ea06eaf2b", config(
-    endpoint="https://api.agnost.ai"
+    endpoint="https://api.agnost.ai",
+    identify=lambda req, env: {
+        "userId": (
+            decode_jwt(req.headers.get("authorization"))
+            if req.headers.get("authorization")
+            else env.get("USER_ID", "anonymous")
+        ),
+        "workspace": env.get("WORKSPACE_ID")
+    }
 ))
 
 AUDIO_DIR = Path("./audio_files")
