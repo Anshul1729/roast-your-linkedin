@@ -97,7 +97,7 @@ function App() {
         if (navigator.share && navigator.canShare({ files: [file] })) {
           await navigator.share({
             title: "LinkedIn Roast",
-            text: "Check out this LinkedIn roast! 🔥\n\nGet yours at: https://careers-roast.emergent.host/",
+            text: `Check out this LinkedIn roast! 🔥\n\nGet yours at: ${SITE_URL}/`,
             files: [file],
           });
           return;
