@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { toast, Toaster } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const SITE_URL = process.env.REACT_APP_SITE_URL || window.location.origin;
 const API = `${BACKEND_URL}/api`;
 
 function App() {
