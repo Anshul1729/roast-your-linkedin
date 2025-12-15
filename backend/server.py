@@ -159,19 +159,19 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
             
             logger.info(f"Successfully scraped profile: {profile_data.get('full_name', 'Unknown')}")
             
-            # Cache the profile data
+            # Cache the profile data with normalized URL
             await db.linkedin_cache.update_one(
-                {"linkedin_url": linkedin_url},
+                {"linkedin_url": normalized_url},
                 {
                     "$set": {
-                        "linkedin_url": linkedin_url,
+                        "linkedin_url": normalized_url,
                         "profile_data": profile_data,
                         "cached_at": datetime.now(timezone.utc)
                     }
                 },
                 upsert=True
             )
-            logger.info(f"Cached profile data for {linkedin_url}")
+            logger.info(f"Cached profile data for {normalized_url}")
             
             return profile_data
             
