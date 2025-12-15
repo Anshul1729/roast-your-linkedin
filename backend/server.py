@@ -81,8 +81,14 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
     """Scrape LinkedIn profile using RapidAPI Fresh LinkedIn Profile Data with caching"""
     rapidapi_key = os.getenv("RAPIDAPI_KEY")
     
+    # Normalize LinkedIn URL (remove www, trailing slash, ensure https)
+    normalized_url = linkedin_url.strip()
+    normalized_url = normalized_url.replace('http://', 'https://')
+    normalized_url = normalized_url.replace('www.linkedin.com', 'linkedin.com')
+    normalized_url = normalized_url.rstrip('/')
+    
     # Check cache first (7 days expiration)
-    cached_profile = await db.linkedin_cache.find_one({"linkedin_url": linkedin_url})
+    cached_profile = await db.linkedin_cache.find_one({"linkedin_url": normalized_url})
     if cached_profile:
         cached_at = cached_profile.get("cached_at")
         if cached_at:
