@@ -86,11 +86,7 @@ function App() {
       const roastCount = parseInt(localStorage.getItem('roastCount') || '0') + 1;
       localStorage.setItem('roastCount', roastCount.toString());
       
-      // Show feedback after first roast
-      if (roastCount === 1 && !localStorage.getItem('feedbackGiven')) {
-        setTimeout(() => setShowFeedback(true), 5000); // 5 seconds after first roast
-      }
-      
+      // Show tip popup after 3 roasts
       if (roastCount >= 3 && !localStorage.getItem('tipShown')) {
         setTimeout(() => setShowTipPopup(true), 2000);
       }
