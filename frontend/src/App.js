@@ -330,20 +330,20 @@ function App() {
 
                   <div className="flex gap-3 px-4 pb-4">
                     <Button
-                      data-testid="download-btn"
-                      onClick={handleDownload}
-                      className="flex-1 h-12 md:h-14 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#7000FF] hover:bg-[#7000FF] hover:text-white transition-all duration-100 uppercase tracking-widest text-xs md:text-sm"
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      DOWNLOAD
-                    </Button>
-                    <Button
                       data-testid="share-btn"
                       onClick={handleShare}
                       className="flex-1 h-12 md:h-14 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#00FF94] hover:bg-[#00FF94] hover:text-black transition-all duration-100 uppercase tracking-widest text-xs md:text-sm"
                     >
                       <Share2 className="mr-2 h-4 w-4" />
                       SHARE
+                    </Button>
+                    <Button
+                      data-testid="rate-btn"
+                      onClick={() => setShowFeedback(true)}
+                      className="flex-1 h-12 md:h-14 rounded-none border-2 border-white/20 bg-transparent text-[#E0E0E0] hover:border-[#FFB800] hover:bg-[#FFB800] hover:text-black transition-all duration-100 uppercase tracking-widest text-xs md:text-sm"
+                    >
+                      <span className="mr-2">⭐</span>
+                      RATE US
                     </Button>
                   </div>
                   
