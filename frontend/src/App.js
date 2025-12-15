@@ -30,20 +30,26 @@ function App() {
     "Adding masala to the roast..."
   ];
 
-  const handleFeedbackSubmit = async (stars, comment = '') => {
+  const handleFeedbackSubmit = async () => {
+    if (rating === 0) {
+      toast.error('Please select a rating');
+      return;
+    }
+    
     try {
+      const feedbackComment = document.getElementById('feedback-comment')?.value || '';
       await axios.post(`${API}/feedback`, {
-        rating: stars,
-        comment: comment,
+        rating: rating,
+        comment: feedbackComment,
         timestamp: new Date().toISOString(),
       });
-      localStorage.setItem('feedbackGiven', 'true');
       setShowFeedback(false);
+      setRating(0);
       toast.success('Thanks for your feedback! 🙏');
     } catch (error) {
       console.error('Feedback error:', error);
-      localStorage.setItem('feedbackGiven', 'true');
       setShowFeedback(false);
+      setRating(0);
       toast.success('Thanks! 🙏');
     }
   };
