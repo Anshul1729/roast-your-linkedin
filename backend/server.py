@@ -400,6 +400,30 @@ async def get_audio(filename: str):
         filename=filename
     )
 
+class FeedbackRequest(BaseModel):
+    rating: int
+    comment: Optional[str] = ""
+    timestamp: str
+
+@api_router.post("/feedback")
+async def submit_feedback(feedback: FeedbackRequest):
+    """Store user feedback"""
+    try:
+        feedback_data = {
+            "rating": feedback.rating,
+            "comment": feedback.comment,
+            "timestamp": feedback.timestamp,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.feedback.insert_one(feedback_data)
+        logger.info(f"Feedback received: {feedback.rating} stars")
+        
+        return {"status": "success", "message": "Thank you for your feedback!"}
+    except Exception as e:
+        logger.error(f"Error storing feedback: {str(e)}")
+        return {"status": "success", "message": "Thank you!"}
+
 @api_router.get("/")
 async def root():
     return {"message": "LinkedIn Roaster API"}
