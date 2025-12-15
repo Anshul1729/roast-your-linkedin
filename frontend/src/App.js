@@ -21,6 +21,7 @@ function App() {
   const [showTipPopup, setShowTipPopup] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [rating, setRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState("");
 
   const loadingMessages = [
     "Stalking their profile...",
@@ -37,19 +38,20 @@ function App() {
     }
     
     try {
-      const feedbackComment = document.getElementById('feedback-comment')?.value || '';
-      await axios.post(`${API}/feedback`, {
+      await axios.post(`${API}/submit-rating`, {
         rating: rating,
-        comment: feedbackComment,
-        timestamp: new Date().toISOString(),
+        feedback_text: feedbackText,
       });
       setShowFeedback(false);
       setRating(0);
+      setFeedbackText("");
+      localStorage.setItem('feedbackGiven', 'true');
       toast.success('Thanks for your feedback! 🙏');
     } catch (error) {
       console.error('Feedback error:', error);
       setShowFeedback(false);
       setRating(0);
+      setFeedbackText("");
       toast.success('Thanks! 🙏');
     }
   };
@@ -334,7 +336,7 @@ function App() {
                   </div>
                   
                   {/* Footer on Roast Page */}
-                  <div className="border-t border-white/10 py-3 text-center space-y-2">
+                  <div className="border-t border-white/10 py-3 text-center">
                     <p className="text-xs text-[#666666]">
                       Created by{" "}
                       <a
@@ -349,17 +351,6 @@ function App() {
                         </svg>
                       </a>
                     </p>
-                    <p className="text-xs text-[#444444] italic">
-                      Loved your roast?{" "}
-                      <a
-                        href="https://www.linkedin.com/in/anshul-shivhare/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#888888] hover:text-[#FF2E00] transition-colors"
-                      >
-                        Drop a hi 👋
-                      </a>
-                    </p>
                   </div>
                 </div>
               </div>
@@ -369,7 +360,7 @@ function App() {
 
         {/* Footer */}
         <footer className="mt-16 pb-24 md:pb-16 border-t border-white/10 pt-8">
-          <div className="text-center space-y-3">
+          <div className="text-center">
             <p className="text-xs md:text-sm text-[#666666]">
               Created by{" "}
               <a
@@ -384,70 +375,83 @@ function App() {
                 </svg>
               </a>
             </p>
-            <p className="text-xs text-[#444444] italic">
-              Loved your roast?{" "}
-              <a
-                href="https://www.linkedin.com/in/anshul-shivhare/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#888888] hover:text-[#FF2E00] transition-colors"
-              >
-                Drop a hi 👋
-              </a>
-            </p>
           </div>
         </footer>
       </div>
 
       <Toaster position="top-center" theme="dark" />
       
-      {/* Feedback Modal */}
+      {/* Rating Popup Modal */}
       {showFeedback && (
-        <div className="fixed bottom-4 right-4 bg-[#0A0A0A] border-2 border-[#FF2E00] p-4 max-w-sm w-full mx-4 md:mx-0 z-[100] shadow-[0_0_30px_rgba(255,46,0,0.4)]">
-          <button
-            onClick={() => {
-              setShowFeedback(false);
-              localStorage.setItem('feedbackGiven', 'true');
-            }}
-            className="absolute top-2 right-2 text-[#666666] hover:text-white transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          
-          <h3 className="text-sm font-bold text-[#FF2E00] mb-2 uppercase tracking-wider">
-            Quick Feedback
-          </h3>
-          
-          <p className="text-xs text-[#AAAAAA] mb-3">
-            How was your roast experience?
-          </p>
-          
-          <div className="flex gap-2 mb-3">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                onClick={() => {
-                  setRating(star);
-                  handleFeedbackSubmit(star);
-                }}
-                className="text-2xl hover:scale-110 transition-transform"
-              >
-                {star <= rating ? '⭐' : '☆'}
-              </button>
-            ))}
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
+          <div className="bg-[#0A0A0A] border-2 border-[#FF2E00] p-6 md:p-8 max-w-md w-full relative">
+            <button
+              onClick={() => {
+                setShowFeedback(false);
+                setRating(0);
+                setFeedbackText("");
+              }}
+              className="absolute top-4 right-4 text-[#666666] hover:text-white transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <h3 className="text-xl md:text-2xl font-bold text-[#FF2E00] mb-4 uppercase tracking-wider" style={{ fontFamily: "'Anton', sans-serif" }}>
+              RATE US 🔥
+            </h3>
+            
+            <p className="text-[#E0E0E0] mb-4 text-sm md:text-base">
+              How was your roast experience?
+            </p>
+            
+            {/* Star Rating */}
+            <div className="flex gap-2 mb-6 justify-center">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className="text-4xl hover:scale-110 transition-transform"
+                >
+                  {star <= rating ? '⭐' : '☆'}
+                </button>
+              ))}
+            </div>
+            
+            {/* Optional Feedback Text */}
+            <div className="mb-6">
+              <label className="block text-xs text-[#AAAAAA] mb-2 uppercase tracking-wider">
+                Additional Feedback (Optional)
+              </label>
+              <textarea
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                placeholder="Tell us more..."
+                className="w-full h-24 bg-black/50 border border-white/20 p-3 text-[#E0E0E0] text-sm resize-none focus:border-[#FF2E00] focus:outline-none"
+              />
+            </div>
+            
+            {/* Submit Button */}
+            <Button
+              onClick={handleFeedbackSubmit}
+              disabled={rating === 0}
+              className="w-full h-12 rounded-none border-2 border-[#FF2E00] bg-transparent text-[#FF2E00] hover:bg-[#FF2E00] hover:text-white transition-all duration-100 uppercase tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              SUBMIT RATING
+            </Button>
+            
+            <button
+              onClick={() => {
+                setShowFeedback(false);
+                setRating(0);
+                setFeedbackText("");
+              }}
+              className="w-full mt-3 text-xs text-[#666666] hover:text-[#AAAAAA] transition-colors"
+            >
+              Maybe later
+            </button>
           </div>
-          
-          <button
-            onClick={() => {
-              setShowFeedback(false);
-              localStorage.setItem('feedbackGiven', 'true');
-            }}
-            className="text-xs text-[#666666] hover:text-[#AAAAAA] transition-colors"
-          >
-            Maybe later
-          </button>
         </div>
       )}
       

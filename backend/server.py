@@ -415,7 +415,7 @@ class FeedbackRequest(BaseModel):
 
 @api_router.post("/feedback")
 async def submit_feedback(feedback: FeedbackRequest):
-    """Store user feedback"""
+    """Store user feedback (legacy endpoint)"""
     try:
         feedback_data = {
             "rating": feedback.rating,
@@ -430,6 +430,28 @@ async def submit_feedback(feedback: FeedbackRequest):
         return {"status": "success", "message": "Thank you for your feedback!"}
     except Exception as e:
         logger.error(f"Error storing feedback: {str(e)}")
+        return {"status": "success", "message": "Thank you!"}
+
+class RatingRequest(BaseModel):
+    rating: int
+    feedback_text: Optional[str] = ""
+
+@api_router.post("/submit-rating")
+async def submit_rating(rating_request: RatingRequest):
+    """Store user ratings from Rate Us button"""
+    try:
+        rating_data = {
+            "rating": rating_request.rating,
+            "feedback_text": rating_request.feedback_text,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.ratings.insert_one(rating_data)
+        logger.info(f"Rating received: {rating_request.rating} stars")
+        
+        return {"status": "success", "message": "Thank you for your feedback!"}
+    except Exception as e:
+        logger.error(f"Error storing rating: {str(e)}")
         return {"status": "success", "message": "Thank you!"}
 
 @api_router.get("/")
