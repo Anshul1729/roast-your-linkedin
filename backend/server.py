@@ -98,8 +98,10 @@ async def scrape_linkedin_profile(linkedin_url: str) -> dict:
             
             cache_age = datetime.now(timezone.utc) - cached_at
             if cache_age.days < 7:
-                logger.info(f"Using cached profile data for {linkedin_url} (age: {cache_age.days} days)")
+                logger.info(f"Using cached profile data for {normalized_url} (age: {cache_age.days} days)")
                 return cached_profile["profile_data"]
+    
+    logger.info(f"Cache miss for {normalized_url}, fetching from RapidAPI")
     
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
