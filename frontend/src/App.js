@@ -30,6 +30,24 @@ function App() {
     "Adding masala to the roast..."
   ];
 
+  const handleFeedbackSubmit = async (stars, comment = '') => {
+    try {
+      await axios.post(`${API}/feedback`, {
+        rating: stars,
+        comment: comment,
+        timestamp: new Date().toISOString(),
+      });
+      localStorage.setItem('feedbackGiven', 'true');
+      setShowFeedback(false);
+      toast.success('Thanks for your feedback! 🙏');
+    } catch (error) {
+      console.error('Feedback error:', error);
+      localStorage.setItem('feedbackGiven', 'true');
+      setShowFeedback(false);
+      toast.success('Thanks! 🙏');
+    }
+  };
+
   const handleGenerateRoast = async () => {
     if (!linkedinUrl.trim()) {
       toast.error("Please enter a LinkedIn URL");
