@@ -415,6 +415,56 @@ function App() {
 
       <Toaster position="top-center" theme="dark" />
       
+      {/* Feedback Modal */}
+      {showFeedback && (
+        <div className="fixed bottom-4 right-4 bg-[#0A0A0A] border-2 border-[#FF2E00] p-4 max-w-sm w-full mx-4 md:mx-0 z-[100] shadow-[0_0_30px_rgba(255,46,0,0.4)]">
+          <button
+            onClick={() => {
+              setShowFeedback(false);
+              localStorage.setItem('feedbackGiven', 'true');
+            }}
+            className="absolute top-2 right-2 text-[#666666] hover:text-white transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          <h3 className="text-sm font-bold text-[#FF2E00] mb-2 uppercase tracking-wider">
+            Quick Feedback
+          </h3>
+          
+          <p className="text-xs text-[#AAAAAA] mb-3">
+            How was your roast experience?
+          </p>
+          
+          <div className="flex gap-2 mb-3">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                onClick={() => {
+                  setRating(star);
+                  handleFeedbackSubmit(star);
+                }}
+                className="text-2xl hover:scale-110 transition-transform"
+              >
+                {star <= rating ? '⭐' : '☆'}
+              </button>
+            ))}
+          </div>
+          
+          <button
+            onClick={() => {
+              setShowFeedback(false);
+              localStorage.setItem('feedbackGiven', 'true');
+            }}
+            className="text-xs text-[#666666] hover:text-[#AAAAAA] transition-colors"
+          >
+            Maybe later
+          </button>
+        </div>
+      )}
+      
       {/* Tip Popup */}
       {showTipPopup && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
