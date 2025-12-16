@@ -210,6 +210,9 @@ async def generate_roast(profile_data: dict, roast_style: str) -> str:
     full_name = profile_data.get('full_name', profile_data.get('fullName', 'No name'))
     headline = profile_data.get('headline', 'No headline')
     about = profile_data.get('about', profile_data.get('summary', 'No summary'))
+    # Handle None values for about
+    if about is None or about == '':
+        about = 'No summary'
     experiences = profile_data.get('experiences', profile_data.get('experience', []))
     educations = profile_data.get('educations', profile_data.get('education', []))
     
