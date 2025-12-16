@@ -206,26 +206,53 @@ async def generate_roast(profile_data: dict, roast_style: str) -> str:
     
     style_instruction = style_prompts.get(roast_style, style_prompts["mix"])
     
-    # Handle RapidAPI field names (full_name, about, experiences, educations)
+    # Handle RapidAPI field names with comprehensive None handling
     full_name = profile_data.get('full_name', profile_data.get('fullName', 'No name'))
+    if full_name is None or full_name == '':
+        full_name = 'No name'
+    
     headline = profile_data.get('headline', 'No headline')
+    if headline is None or headline == '':
+        headline = 'No headline'
+    
     about = profile_data.get('about', profile_data.get('summary', 'No summary'))
-    # Handle None values for about
     if about is None or about == '':
         about = 'No summary'
-    experiences = profile_data.get('experiences', profile_data.get('experience', []))
-    educations = profile_data.get('educations', profile_data.get('education', []))
     
-    # Extract company names from experiences
-    companies = [exp.get('company', '') for exp in experiences if exp.get('company')][:3]
+    experiences = profile_data.get('experiences', profile_data.get('experience', []))
+    # Ensure experiences is a list
+    if experiences is None or not isinstance(experiences, list):
+        experiences = []
+    
+    educations = profile_data.get('educations', profile_data.get('education', []))
+    # Ensure educations is a list
+    if educations is None or not isinstance(educations, list):
+        educations = []
+    
+    # Extract company names from experiences (with safety checks)
+    companies = []
+    for exp in experiences:
+        if isinstance(exp, dict) and exp.get('company'):
+            companies.append(exp.get('company'))
+        if len(companies) >= 3:
+            break
     company_text = ', '.join(companies) if companies else 'No companies listed'
     
-    # Extract schools from educations
-    schools = [edu.get('school', '') for edu in educations if edu.get('school')][:2]
+    # Extract schools from educations (with safety checks)
+    schools = []
+    for edu in educations:
+        if isinstance(edu, dict) and edu.get('school'):
+            schools.append(edu.get('school'))
+        if len(schools) >= 2:
+            break
     school_text = ', '.join(schools) if schools else 'No education listed'
     
-    # Get current job title
-    current_job = experiences[0].get('title', 'No job title') if experiences else 'No job title'
+    # Get current job title (with safety checks)
+    current_job = 'No job title'
+    if experiences and isinstance(experiences[0], dict):
+        current_job = experiences[0].get('title', 'No job title')
+        if current_job is None or current_job == '':
+            current_job = 'No job title'
     
     profile_summary = f"""
 Name: {full_name}
