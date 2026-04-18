@@ -284,7 +284,7 @@ Profile:
 DESTROY them in 120-150 words. Keep it punchy, keep it brutal. End with "Okay Bye!!" GO."""
     
     message = anthropic_client.messages.create(
-        model="claude-sonnet-4-5-20250929",
+        model="claude-sonnet-4-6",
         max_tokens=512,
         messages=[{"role": "user", "content": prompt}]
     )
