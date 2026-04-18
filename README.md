@@ -15,6 +15,8 @@ A fun side project that takes your (or anyone's) LinkedIn profile and generates 
 
 The whole flow takes about 10–15 seconds. The emotional damage lasts longer.
 
+![LinkedIn Roast](assets/screenshot.jpeg)
+
 ---
 
 ## Why I built this
